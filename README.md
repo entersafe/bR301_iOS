@@ -9,6 +9,9 @@ version 2.1 of the License, or (at your option) any later version.
 History
 -------
 
+If found missing file, please do rename below file  libFTSessionController.m to  libFTSessionController.a
+This file you can found in bR301_iOS/tree/master/libs/source/src
+
 This driver is based on the CCID driver from Ludovic Rousseau available at http://pcsclite.alioth.debian.org/ccid.html
 
 bR301_iOS
