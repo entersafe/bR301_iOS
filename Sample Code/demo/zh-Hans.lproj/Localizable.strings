@@ -55,7 +55,7 @@
 
 
 //AlertView Information
-"DEVI_INFOR" = "iR301-U设备信息";
+"DEVI_INFOR" = "Feitian Mobile Reader";
 "FACT_INFOR" = "厂商信息: 飞天诚信科技股份有限公司";
 "SOFT_INFOR" = "软件名称: iR301-U";
 "HARD_VER" = "硬件版本: V";

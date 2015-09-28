@@ -30,6 +30,7 @@
 		5238A36813A5B75B00C88B01 /* disopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5238A36613A5B75B00C88B01 /* disopWindow.m */; };
 		52B526A213A7311D001E2263 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B526A113A7311D001E2263 /* ExternalAccessory.framework */; };
 		B50D04391BB566C400B1EDB3 /* libiRockey301_ccid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B50D04371BB566C400B1EDB3 /* libiRockey301_ccid.a */; settings = {ASSET_TAGS = (); }; };
+		B5F234491BB9183600C0B7CD /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F234481BB9183600C0B7CD /* Default-568h@2x.png */; settings = {ASSET_TAGS = (); }; };
 		D32D321A192CAE520087CFCE /* OK.png in Resources */ = {isa = PBXBuildFile; fileRef = D32D3219192CAE520087CFCE /* OK.png */; };
 		D33063A619346C2E001C247E /* op_bg_detail_en.png in Resources */ = {isa = PBXBuildFile; fileRef = D33063A519346C2E001C247E /* op_bg_detail_en.png */; };
 		D351482F19767AA90021BFB1 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D351483119767AA90021BFB1 /* Localizable.strings */; };
@@ -63,6 +64,7 @@
 		5238A36613A5B75B00C88B01 /* disopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = disopWindow.m; sourceTree = "<group>"; };
 		52B526A113A7311D001E2263 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		B50D04371BB566C400B1EDB3 /* libiRockey301_ccid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; name = libiRockey301_ccid.a; path = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/libiRockey301_ccid.a; sourceTree = "<absolute>"; };
+		B5F234481BB9183600C0B7CD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		D32B616D1935C75800FC89B3 /* ft301u.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft301u.h; sourceTree = "<group>"; };
 		D32B616E1935C75800FC89B3 /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReaderInterface.h; sourceTree = "<group>"; };
 		D32B616F1935C75800FC89B3 /* winscard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = winscard.h; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				B5F234481BB9183600C0B7CD /* Default-568h@2x.png */,
 				D32B616B1935C75800FC89B3 /* SDK */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -229,7 +232,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "call_lib" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -270,6 +273,7 @@
 				50479B37147CDEF400259322 /* OP_BG.png in Resources */,
 				D351482F19767AA90021BFB1 /* Localizable.strings in Resources */,
 				50479B38147CDEF400259322 /* SEND_OFF.png in Resources */,
+				B5F234491BB9183600C0B7CD /* Default-568h@2x.png in Resources */,
 				50479B39147CDEF400259322 /* SEND_ON.png in Resources */,
 				D33063A619346C2E001C247E /* op_bg_detail_en.png in Resources */,
 				5099F11315FD77E0004C7CCB /* no_token_product_cn.png in Resources */,
@@ -311,7 +315,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
@@ -324,6 +327,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ftsafe.${PRODUCT_NAME:rfc1034identifier}.demo";
 				PRODUCT_NAME = iR301U;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -337,9 +341,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Feitian Technologies Co., Ltd.";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Feitian Technologies Co., Ltd.";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Ben wang (TUDX6MHKDC)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Ben wang (TUDX6MHKDC)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -348,6 +351,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ftsafe.${PRODUCT_NAME:rfc1034identifier}.demo";
 				PRODUCT_NAME = iR301U;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -361,15 +365,16 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_IDENTITY = "iPhone Distribution: FEITIAN Technologies Co.,Ltd. (S47T4UESP3)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: FEITIAN Technologies Co.,Ltd. (S47T4UESP3)";
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = "";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "iR301-U";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -381,7 +386,6 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_IDENTITY = "iPhone Distribution: FEITIAN Technologies Co.,Ltd. (S47T4UESP3)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: FEITIAN Technologies Co.,Ltd. (S47T4UESP3)";
 				GCC_C_LANGUAGE_STANDARD = c99;

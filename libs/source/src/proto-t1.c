@@ -138,13 +138,13 @@ int t1_set_param(t1_state_t * t1, int type, long value)
 		t1_set_checksum(t1, type);
 		break;
 	case IFD_PROTOCOL_T1_IFSC:
-		t1->ifsc = value;
+		t1->ifsc = (unsigned int)value;
 		break;
 	case IFD_PROTOCOL_T1_IFSD:
-		t1->ifsd = value;
+		t1->ifsd = (unsigned int)value;
 		break;
 	case IFD_PROTOCOL_T1_STATE:
-		t1->state = value;
+		t1->state = (unsigned int)value;
 		break;
 	case IFD_PROTOCOL_T1_MORE:
 		t1->more = value;
@@ -184,8 +184,8 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 	resyncs = 3;
 
 	/* Initialize send/recv buffer */
-	ct_buf_set(&sbuf, (void *)snd_buf, snd_len);
-	ct_buf_init(&rbuf, rcv_buf, rcv_len);
+	ct_buf_set(&sbuf, (void *)snd_buf, (unsigned int)snd_len);
+	ct_buf_init(&rbuf, rcv_buf, (unsigned int)rcv_len);
 
 	/* Send the first block */
 	slen = t1_build(t1, sdata, dad, T1_I_BLOCK, &sbuf, &last_send);
@@ -337,7 +337,7 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 			 * sequence number, it received the previous
 			 * block successfully */
 			if (t1_seq(pcb) != t1->ns) {
-				ct_buf_get(&sbuf, NULL, last_send);
+				ct_buf_get(&sbuf, NULL, (unsigned int)last_send);
 				sent_length += last_send;
 				last_send = 0;
 				t1->ns ^= 1;
@@ -357,7 +357,7 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 			 * the last block we sent was received successfully. */
 			if (t1->state == SENDING) {
 //				DEBUG_COMM("");
-				ct_buf_get(&sbuf, NULL, last_send);
+				ct_buf_get(&sbuf, NULL, (unsigned int)last_send);
 				last_send = 0;
 				t1->ns ^= 1;
 			}
@@ -399,7 +399,7 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				last_send = 0;
 				resyncs = 3;
 				retries = t1->retries;
-				ct_buf_init(&rbuf, rcv_buf, rcv_len);
+				ct_buf_init(&rbuf, rcv_buf, (unsigned int)rcv_len);
 				slen = t1_build(t1, sdata, dad, T1_I_BLOCK,
 						&sbuf, &last_send);
 				continue;
@@ -620,20 +620,20 @@ t1_rebuild(t1_state_t *t1, unsigned char *block)
 static unsigned int t1_compute_checksum(t1_state_t * t1,
 	unsigned char *data, size_t len)
 {
-	return len + t1->checksum(data, len, data + len);
+	return (unsigned int)(len + t1->checksum(data, len, data + len));
 }
 
 static int t1_verify_checksum(t1_state_t * t1, unsigned char *rbuf,
 	size_t len)
 {
 	unsigned char csum[2];
-	int m, n;
+	unsigned long m, n = 0;
 
 	m = len - t1->rc_bytes;
 	n = t1->rc_bytes;
-
-	if (m < 0)
-		return 0;
+//
+//	if (m < 0)
+//		return 0;
 
 	t1->checksum(rbuf, m, csum);
 	if (!memcmp(rbuf + m, csum, n))
@@ -648,7 +648,7 @@ static int t1_verify_checksum(t1_state_t * t1, unsigned char *rbuf,
 static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 	size_t rmax)
 {
-	int n, m;
+	unsigned int n;
 	_ccid_descriptor *ccid_desc ;
 	int oldReadTimeout;
 	unsigned int rmax_int;
@@ -670,15 +670,15 @@ static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 	{
 		rmax = 3;
 
-		n = CCID_Transmit(t1 -> lun, slen, block, rmax, t1->wtx);
+		n = (unsigned int)CCID_Transmit(t1 -> lun, (unsigned int)slen, block, rmax, t1->wtx);
 		if (n != IFD_SUCCESS)
 			return n;
 
 		/* the second argument of CCID_Receive() is (unsigned int *)
 		 * so we can't use &rmax since &rmax is a (size_t *) and may not
 		 * be the same on 64-bits architectures for example (iMac G5) */
-		rmax_int = rmax;
-		n = CCID_Receive(t1 -> lun, &rmax_int, block, NULL);
+		rmax_int = (unsigned int)rmax;
+		n = (unsigned int)CCID_Receive(t1 -> lun, &rmax_int, block, NULL);
 
 		if (n == IFD_PARITY_ERROR)
 			return -2;
@@ -687,45 +687,45 @@ static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 
 		rmax = block[2] + 1;
 
-		n = CCID_Transmit(t1 -> lun, 0, block, rmax, t1->wtx);
+		n = (unsigned int)CCID_Transmit(t1 -> lun, 0, block, rmax, t1->wtx);
 		if (n != IFD_SUCCESS)
 			return n;
 
-		rmax_int = rmax;
-		n = CCID_Receive(t1 -> lun, &rmax_int, &block[3], NULL);
+		rmax_int = (unsigned int)rmax;
+		n = (unsigned int)CCID_Receive(t1 -> lun, &rmax_int, &block[3], NULL);
 		rmax = rmax_int;
 		if (n == IFD_PARITY_ERROR)
 			return -2;
 		if (n != IFD_SUCCESS)
 			return -1;
 
-		n = rmax + 3;
+		n = (unsigned int)rmax + 3;
 	}
 	else
 	{
-		n = CCID_Transmit(t1 -> lun, slen, block, 0, t1->wtx);
+		n = (unsigned int)CCID_Transmit(t1 -> lun, (unsigned int)slen, block, 0, t1->wtx);
 		t1->wtx = 0;	/* reset to default value */
 		if (n != IFD_SUCCESS)
 			return n;
 
 		/* Get the response en bloc */
-		rmax_int = rmax;
-		n = CCID_Receive(t1 -> lun, &rmax_int, block, NULL);
+		rmax_int = (unsigned int)rmax;
+		n = (unsigned int)CCID_Receive(t1 -> lun, &rmax_int, block, NULL);
 		rmax = rmax_int;
 		if (n == IFD_PARITY_ERROR)
 			return -2;
 		if (n != IFD_SUCCESS)
 			return -1;
 
-		n = rmax;
+		n = (unsigned int)rmax;
 	}
 
-	if (n >= 0)
-	{
-		m = block[2] + 3 + t1->rc_bytes;
-		if (m < n)
-			n = m;
-	}
+//	if (n >= 0)
+//	{
+//		m = block[2] + 3 + t1->rc_bytes;
+//		if (m < n)
+//			n = m;
+//	}
 
 	//if (n >= 0)
         ;//		DEBUG_XXD("received: ", block, n);
@@ -753,7 +753,7 @@ int t1_negotiate_ifsd(t1_state_t * t1, unsigned int dad, int ifsd)
 	snd_len = 1;
 
 	/* Initialize send/recv buffer */
-	ct_buf_set(&sbuf, (void *)snd_buf, snd_len);
+	ct_buf_set(&sbuf, (void *)snd_buf, (unsigned int)snd_len);
 
 	while (TRUE)
 	{

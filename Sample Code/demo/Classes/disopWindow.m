@@ -185,12 +185,14 @@ int touchInDropCount = 0;
 #pragma mark -
 #pragma mark ReaderInterfaceDelegate Methods
 BOOL cardIsAttached=FALSE;
-/*主线程中更新UI*/
+
+/*Update UI on main thread*/
 -(void)changeCardState
 {
     [cardState setOn:cardIsAttached];
     if (cardIsAttached == FALSE) {
-        //卡片拔出，进行下电操作，将显示打印信息界面清空
+        
+        //When card plug-out, do power off
         disTextView.text = @"";
         SCardDisconnect(gCardHandle,SCARD_UNPOWER_CARD);
         [self disPowerOff];
@@ -201,14 +203,14 @@ BOOL cardIsAttached=FALSE;
 - (void) cardInterfaceDidDetach:(BOOL)attached
 {
     cardIsAttached = attached;
-    //根据卡槽状态，在主线程更新界面显示
+    //According with card slot status to do display
     [self performSelectorOnMainThread:@selector(changeCardState) withObject:nil waitUntilDone:YES];
     
 }
 
 - (void) readerInterfaceDidChange:(BOOL)attached
 {
-    //根据读卡器拔插状态，在主线程更新界面
+    //check card slot status to do specified dispaly
     if (attached) {
         [self performSelectorOnMainThread:@selector(disAccDig) withObject:nil waitUntilDone:YES];
     }
@@ -230,13 +232,13 @@ SCARDCONTEXT gContxtHandle;
 
     showInfoView = nil;
     [self disNoAccDig];
-    //设置委托，用于监控读卡器拔插状态和卡槽状态
+    
+    //Set delegate, using to monitor card slot status
     _readInf = [[ReaderInterface alloc]init];
     [_readInf setDelegate:self];
 
-//    [NSThread detachNewThreadSelector:@selector(scardstatusChangeTest) toTarget:self withObject:nil];
+//  [NSThread detachNewThreadSelector:@selector(scardstatusChangeTest) toTarget:self withObject:nil];
     [cardState setEnabled:false];
-    //    SCardEstablishContext(SCARD_SCOPE_SYSTEM,NULL,NULL,&gContxtHandle);
     
     [super viewDidLoad];
 }
@@ -335,7 +337,7 @@ SCARDCONTEXT gContxtHandle;
 
 
 }
-//显示读卡器的设备信息和SDK的版本信息
+//Display card reader information and SDK version
 -(void) show_iR301_Info
 {
     char firmwareRevision[32]={0};
@@ -357,7 +359,7 @@ SCARDCONTEXT gContxtHandle;
     
     
 }
-//显示读卡器的设备信息和SDK的版本信息的按钮事件
+//Display iR301/bR301 firmware/software information
 -(IBAction) showInfo
 {
     clearView =[[UIView alloc] init];
@@ -400,7 +402,7 @@ SCARDCONTEXT gContxtHandle;
     [self.view addSubview:showInfoView];
     
 }
-//再次按下信息按钮，将其释放
+//Release
 -(void)showInfoViewButtonPressed
 {
     [showInfoView removeFromSuperview];
@@ -433,7 +435,7 @@ SCARDCONTEXT gContxtHandle;
 	}
 }
 
-//上电按钮的事件操作
+//Power on
 #pragma mark operation ----
 -(IBAction) powerOnFun:(id)sender
 {
@@ -521,7 +523,7 @@ SCARDCONTEXT gContxtHandle;
     
 }
 
-//发送APDU按钮的事件操作
+//Send APDU commands to card
 -(IBAction) sendCommandFun:(id)sender
 {
     
@@ -684,7 +686,7 @@ SCARDCONTEXT gContxtHandle;
     dropList.enabled = NO;
     [dropList setBackgroundImage:[UIImage imageNamed:@"DROPLIST_OFF.png"] forState:UIControlStateNormal];
 }
-//下电按钮的事件操作
+//Power off
 -(IBAction) powerOffFun:(id)sender
 {
     disTextView.text = @"";
@@ -726,7 +728,7 @@ SCARDCONTEXT gContxtHandle;
 - (void)dealloc {
 	[super dealloc];
 }
-//下拉框按钮的事件操作
+//drop list button
 -(IBAction)runBtnPressed:(id)sender
 {    
     touchInDropCount++;
@@ -774,7 +776,7 @@ SCARDCONTEXT gContxtHandle;
         if (tableView.tag == alertViewForConpany) {
             cell.backgroundColor = [UIColor clearColor];
             if (indexPath.row == 0) {
-                cell.textLabel.textAlignment = UITextAlignmentCenter;
+                cell.textLabel.textAlignment = NSTextAlignmentCenter;
             }
             cell.textLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12];
             cell.textLabel.text = [showInfoData objectAtIndex:indexPath.row];
@@ -834,7 +836,7 @@ SCARDCONTEXT gContxtHandle;
 
 
 #pragma mark SCardStatus
-//获取卡槽状态的按钮的事件操作
+//Get card slot status event
 -(IBAction) testSCardStatus:(id)sender
 {
     
@@ -860,7 +862,7 @@ SCARDCONTEXT gContxtHandle;
             break;
     }
 }
-//获取序列号按钮的事件操作
+//Get device serial number, from serial number, you can tracking production date
 #pragma mark Hardware serial number
 -(IBAction)getSerialNumber:(id)sender
 {
@@ -873,7 +875,10 @@ SCARDCONTEXT gContxtHandle;
         disTextView.text = [NSString stringWithFormat:@"%s\n", buffer];
     }
 }
-//写flash的按钮的事件操作
+
+//Feitian open 255 byts falsh space for user, user can write their own OEM information
+//Write flash opeartion
+
 #pragma mark W/R flash
 -(IBAction)ftWriteFlash:(id)sender
 {
@@ -897,7 +902,8 @@ SCARDCONTEXT gContxtHandle;
         disTextView.text = @"Write Flash SUCCESS.";;
     }
 }
-//读取FLASH信息的按钮的事件操作
+
+//Read flash
 -(IBAction)ftReadFlash:(id)sender
 {
     unsigned char buffer[255] ={0};
@@ -921,6 +927,9 @@ SCARDCONTEXT gContxtHandle;
     }
 
 }
+
+//One button to test whole function of PC/SC
+//It moved from testpcsc code, more information, please check pcsclite
 
 -(int)test
 {

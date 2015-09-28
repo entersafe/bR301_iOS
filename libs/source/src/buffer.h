@@ -20,10 +20,10 @@ typedef struct ct_buf {
 	unsigned int		overrun;
 } ct_buf_t;
 
-extern void         ct_buf_init(ct_buf_t *, void *, size_t);
-extern void         ct_buf_set(ct_buf_t *, void *, size_t);
-extern int          ct_buf_get(ct_buf_t *, void *, size_t);
-extern int          ct_buf_put(ct_buf_t *, const void *, size_t);
+extern void         ct_buf_init(ct_buf_t *, void *, unsigned int);
+extern void         ct_buf_set(ct_buf_t *, void *, unsigned int);
+extern int          ct_buf_get(ct_buf_t *, void *, unsigned int);
+extern int          ct_buf_put(ct_buf_t *, const void *, unsigned int);
 extern int          ct_buf_putc(ct_buf_t *, int);
 extern unsigned int	ct_buf_avail(ct_buf_t *);
 extern void *		ct_buf_head(ct_buf_t *);

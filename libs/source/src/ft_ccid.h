@@ -27,7 +27,6 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-
 #include "wintypes.h"
 #include "proto-t1.h"
 #include "winscard.h"
@@ -49,18 +48,19 @@ typedef long RESPONSECODE;
 #define ReadPort ReadSerial
 #define WritePort WriteSerial
     
-#ifndef BOOL
-#define BOOL signed char
-#endif
+//#ifndef BOOL
+//#define BOOL signed char
+//#endif
+//
+//#ifndef TRUE
+//#define TRUE 1
+//#endif
+//    
+//#ifndef FALSE
+//#define FALSE 0
+//#endif
+    
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-    
-#ifndef FALSE
-#define FALSE 0
-#endif
-    
 
 /* Protocols */
 #define T_0 	0
@@ -472,7 +472,7 @@ extern  RESPONSECODE CmdEscape(unsigned int reader_index,
                           const unsigned char TxBuffer[], unsigned int TxLength,
                           unsigned char RxBuffer[], unsigned int *RxLength);
 ////////////////////////////////////////////////////////////////////////////
-extern BOOL gIsOpen;
+extern bool gIsOpen;
 extern unsigned int gDevType;
 extern unsigned int gIsReadData ;
 extern unsigned int iR301_or_bR301;

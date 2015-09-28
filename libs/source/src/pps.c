@@ -81,16 +81,16 @@ PPS_Match (BYTE * request, unsigned len_request, BYTE * confirm, unsigned len_co
 	/* See if the reply differs from request */
 	if ((len_request == len_confirm) &&	/* same length */
 		memcmp (request, confirm, len_request))	/* different contents */
-		return FALSE;
+		return false;
 	
 	if (len_request < len_confirm)	/* confirm longer than request */
-		return FALSE;
+		return false;
 	
 	/* See if the card specifies other than default FI and D */
 	if ((PPS_HAS_PPS1 (confirm)) && (confirm[2] != request[2]))
-		return FALSE;
+		return false;
 	
-	return TRUE;
+	return true;
 }
 
 static unsigned
@@ -174,7 +174,7 @@ void extra_egt(ATR_t *atr, _ccid_descriptor *ccid_desc, DWORD Protocol)
 		if (SCARD_PROTOCOL_T0 == Protocol)
 		{
 			/* Init TC1 */
-			atr->ib[0][ATR_INTERFACE_BYTE_TC].present = TRUE;
+			atr->ib[0][ATR_INTERFACE_BYTE_TC].present = true;
 			atr->ib[0][ATR_INTERFACE_BYTE_TC].value = 2;
 		
 		}
@@ -189,7 +189,7 @@ void extra_egt(ATR_t *atr, _ccid_descriptor *ccid_desc, DWORD Protocol)
 					((atr->ib[i][ATR_INTERFACE_BYTE_TB].value & 0x0F) >= 2))
 				{
 					/* Init TC1 */
-					atr->ib[0][ATR_INTERFACE_BYTE_TC].present = TRUE;
+					atr->ib[0][ATR_INTERFACE_BYTE_TC].present = true;
 					atr->ib[0][ATR_INTERFACE_BYTE_TC].value = 2;
 					
 					/* only the first TBi (i>2) must be used */
