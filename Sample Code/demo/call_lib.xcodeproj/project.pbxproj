@@ -60,7 +60,6 @@
 		5099F11115FD77E0004C7CCB /* op_bg_cn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = op_bg_cn.png; sourceTree = "<group>"; };
 		5099F11215FD77E0004C7CCB /* op_bg_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = op_bg_en.png; sourceTree = "<group>"; };
 		50BAB718157CB791000B037C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Resource/main.m; sourceTree = "<group>"; };
-		50BAB725157CB8A4000B037C /* call_lib_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = call_lib_Prefix.pch; sourceTree = "<group>"; };
 		5238A36613A5B75B00C88B01 /* disopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = disopWindow.m; sourceTree = "<group>"; };
 		52B526A113A7311D001E2263 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		7CE3C65E1BE2F621007F3264 /* libiRockey301_ccid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libiRockey301_ccid.a; sourceTree = "<group>"; };
@@ -138,7 +137,6 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				50BAB725157CB8A4000B037C /* call_lib_Prefix.pch */,
 				50BAB718157CB791000B037C /* main.m */,
 			);
 			name = "Other Sources";
@@ -322,7 +320,6 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = call_lib_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
@@ -347,7 +344,6 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_BITCODE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = call_lib_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
