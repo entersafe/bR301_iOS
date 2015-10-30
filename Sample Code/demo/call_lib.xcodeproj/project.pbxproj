@@ -29,7 +29,7 @@
 		50BAB71B157CB791000B037C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50BAB718157CB791000B037C /* main.m */; };
 		5238A36813A5B75B00C88B01 /* disopWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5238A36613A5B75B00C88B01 /* disopWindow.m */; };
 		52B526A213A7311D001E2263 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B526A113A7311D001E2263 /* ExternalAccessory.framework */; };
-		B50D04391BB566C400B1EDB3 /* libiRockey301_ccid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B50D04371BB566C400B1EDB3 /* libiRockey301_ccid.a */; settings = {ASSET_TAGS = (); }; };
+		7CE3C65F1BE2F621007F3264 /* libiRockey301_ccid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CE3C65E1BE2F621007F3264 /* libiRockey301_ccid.a */; settings = {ASSET_TAGS = (); }; };
 		B5F234491BB9183600C0B7CD /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F234481BB9183600C0B7CD /* Default-568h@2x.png */; settings = {ASSET_TAGS = (); }; };
 		D32D321A192CAE520087CFCE /* OK.png in Resources */ = {isa = PBXBuildFile; fileRef = D32D3219192CAE520087CFCE /* OK.png */; };
 		D33063A619346C2E001C247E /* op_bg_detail_en.png in Resources */ = {isa = PBXBuildFile; fileRef = D33063A519346C2E001C247E /* op_bg_detail_en.png */; };
@@ -63,7 +63,7 @@
 		50BAB725157CB8A4000B037C /* call_lib_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = call_lib_Prefix.pch; sourceTree = "<group>"; };
 		5238A36613A5B75B00C88B01 /* disopWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = disopWindow.m; sourceTree = "<group>"; };
 		52B526A113A7311D001E2263 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
-		B50D04371BB566C400B1EDB3 /* libiRockey301_ccid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; name = libiRockey301_ccid.a; path = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/libiRockey301_ccid.a; sourceTree = "<absolute>"; };
+		7CE3C65E1BE2F621007F3264 /* libiRockey301_ccid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libiRockey301_ccid.a; sourceTree = "<group>"; };
 		B5F234481BB9183600C0B7CD /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		D32B616D1935C75800FC89B3 /* ft301u.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft301u.h; sourceTree = "<group>"; };
 		D32B616E1935C75800FC89B3 /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReaderInterface.h; sourceTree = "<group>"; };
@@ -83,7 +83,7 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */,
-				B50D04391BB566C400B1EDB3 /* libiRockey301_ccid.a in Frameworks */,
+				7CE3C65F1BE2F621007F3264 /* libiRockey301_ccid.a in Frameworks */,
 				52B526A213A7311D001E2263 /* ExternalAccessory.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -201,7 +201,7 @@
 		D32B61711935C75800FC89B3 /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				B50D04371BB566C400B1EDB3 /* libiRockey301_ccid.a */,
+				7CE3C65E1BE2F621007F3264 /* libiRockey301_ccid.a */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -326,7 +326,8 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
-				LIBRARY_SEARCH_PATHS = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../libs/**";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ftsafe.${PRODUCT_NAME:rfc1034identifier}.demo";
 				PRODUCT_NAME = iR301U;
 				PROVISIONING_PROFILE = "";
@@ -350,7 +351,8 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
-				LIBRARY_SEARCH_PATHS = /Users/ben/Documents/github/bR301_iOS/libs/SDK/lib/;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../libs/**";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ftsafe.${PRODUCT_NAME:rfc1034identifier}.demo";
 				PRODUCT_NAME = iR301U;
 				PROVISIONING_PROFILE = "";
