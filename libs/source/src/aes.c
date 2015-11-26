@@ -135,7 +135,7 @@ void AES_Memset(BYTE * d, BYTE val, int Len)
 }
 
 
-void Aes_setKey(DWORD keysize,BYTE* keyBytes,BYTE *w,BYTE *key,BYTE* Nr,BYTE *Nk)
+void Aes_setKey(int keysize,BYTE* keyBytes,BYTE *w,BYTE *key,BYTE* Nr,BYTE *Nk)
 {
 	SetNbNkNr(keysize,Nr,Nk);
 	AES_Memcpy(key,keyBytes,keysize);

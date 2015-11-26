@@ -36,6 +36,8 @@
 
 #import "EADSessionController.h"
 
+#define FT_IR301_DEBUG
+
 static _ccid_descriptor s_ccidDevice[CCID_DRIVER_MAX_READERS]={0};
 
 static CcidDesc  s_CcidSlots[CCID_DRIVER_MAX_READERS]={0};

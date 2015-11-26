@@ -37,7 +37,7 @@
 "SEND_LABEL_CLOSE" = "Sent Command To Disconnect!";
 
 "CONN_LABEL_OK" = "Connect Successed!";
-"CONN_LABEL_NO" = "Connect Failed!";
+"CONN_LABEL_NO" = "Connect Failed, please check the chip card has plug-in and re-connect";
 
 "CLOSE_CONN_OK" = "Disconnect Successed!";
 
@@ -56,15 +56,15 @@
 "DIS_REV_INFO" = "Display return values.";
 
 //AlertView Information
-"DEVI_INFOR" = "iR301-U Device Info";
-"FACT_INFOR" = "Manufacturer Info: Feitian Technologies";
-"SOFT_INFOR" = "Software Name: iR301-U";
+"DEVI_INFOR" = "Feitian Mobile Reader";
+"FACT_INFOR" = "Hardware Provider: FEITIAN";
+"SOFT_INFOR" = "App name: iR301-U";
 "HARD_VER" = "Hardware Version: V";
 "FIX_VER" = "Firmware Version: V";
-"SOFT_VER" = "Software Version: V1.3.0";
-"SDK_VER" = "SDK版本: V";
+"SOFT_VER" = "App version: V1.3.0";
+"SDK_VER" = "SDK:";
 "AlertOK" = "OK";
-"AlertWarning" = "Warning!!!";
+"AlertWarning" = "Warning!";
 "AlertMessage" = "APDU must be (0-F).";
 
 //error information dictionary

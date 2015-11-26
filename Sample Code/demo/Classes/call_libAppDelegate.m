@@ -43,7 +43,13 @@
         [aController release];}
     
     mainViewController.view.frame = [UIScreen mainScreen].applicationFrame;
-    [window addSubview:[mainViewController view]];
+
+    
+//  Remove below line, because it will crash when using latest xcode
+//  [window addSubview:[mainViewController view]];
+    [window setRootViewController:mainViewController];
+    
+    
     [window makeKeyAndVisible];
    // [UIApplication sharedApplication].idleTimerDisabled = YES;
 

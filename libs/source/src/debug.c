@@ -40,6 +40,8 @@
 #define ERROR_SIGNAL SIGSEGV  
 #endif  
 
+#define FT_IR301_DEBUG
+
 #ifdef FT_IR301_DEBUG
 #define LOG_TO_STDERR  0
 #else

@@ -10,7 +10,7 @@
 #include "buffer.h"
 
 void
-ct_buf_init(ct_buf_t *bp, void *mem, size_t len)
+ct_buf_init(ct_buf_t *bp, void *mem, unsigned int len)
 {
 	memset(bp, 0, sizeof(*bp));
 	bp->base = (unsigned char *) mem;
@@ -18,14 +18,14 @@ ct_buf_init(ct_buf_t *bp, void *mem, size_t len)
 }
 
 void
-ct_buf_set(ct_buf_t *bp, void *mem, size_t len)
+ct_buf_set(ct_buf_t *bp, void *mem, unsigned int len)
 {
 	ct_buf_init(bp, mem, len);
 	bp->tail = len;
 }
 
 int
-ct_buf_get(ct_buf_t *bp, void *mem, size_t len)
+ct_buf_get(ct_buf_t *bp, void *mem, unsigned int len)
 {
 	if (len > bp->tail - bp->head)
 		return -1;
@@ -37,7 +37,7 @@ ct_buf_get(ct_buf_t *bp, void *mem, size_t len)
 }
 
 int
-ct_buf_put(ct_buf_t *bp, const void *mem, size_t len)
+ct_buf_put(ct_buf_t *bp, const void *mem, unsigned int len)
 {
 	if (len > bp->size - bp->tail) {
 		bp->overrun = 1;

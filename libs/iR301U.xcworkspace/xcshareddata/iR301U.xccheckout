@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>31591BC5-2FBF-48C3-968C-7A915463330F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>iR301U</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E0F528C9F8BFA4FC4834BAE7A04872506C27F7C4</key>
+		<string>https://github.com/FeitianSmartcardReader/bR301_iOS.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>libs/iR301U.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E0F528C9F8BFA4FC4834BAE7A04872506C27F7C4</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/FeitianSmartcardReader/bR301_iOS.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E0F528C9F8BFA4FC4834BAE7A04872506C27F7C4</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E0F528C9F8BFA4FC4834BAE7A04872506C27F7C4</string>
+			<key>IDESourceControlWCCName</key>
+			<string>bR301_iOS</string>
+		</dict>
+	</array>
+</dict>
+</plist>

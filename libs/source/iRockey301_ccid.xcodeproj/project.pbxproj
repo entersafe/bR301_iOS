@@ -29,7 +29,11 @@
 		5207A2A015E333E300C156DF /* winscard.m in Sources */ = {isa = PBXBuildFile; fileRef = 5207A29215E333E300C156DF /* winscard.m */; };
 		5207A2A415E3348700C156DF /* iRockey301_ccid-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 5207A2A315E3348700C156DF /* iRockey301_ccid-Prefix.pch */; };
 		52263B2D1573846500CE4DCC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52263B2C1573846500CE4DCC /* Foundation.framework */; };
-		89B2BC781A089FCE00C9A8B2 /* libFTSessionController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89B2BC771A089FCE00C9A8B2 /* libFTSessionController.a */; };
+		B5132B1D1BB9394600665BCD /* ft301u.h in Headers */ = {isa = PBXBuildFile; fileRef = B5132B1A1BB9394600665BCD /* ft301u.h */; settings = {ASSET_TAGS = (); }; };
+		B5132B1E1BB9394600665BCD /* winscard.h in Headers */ = {isa = PBXBuildFile; fileRef = B5132B1B1BB9394600665BCD /* winscard.h */; settings = {ASSET_TAGS = (); }; };
+		B5132B1F1BB9394600665BCD /* wintypes.h in Headers */ = {isa = PBXBuildFile; fileRef = B5132B1C1BB9394600665BCD /* wintypes.h */; settings = {ASSET_TAGS = (); }; };
+		B5EAEBE51BB95C11009CAA54 /* libFTSessionController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5EAEBE41BB95C11009CAA54 /* libFTSessionController.a */; settings = {ASSET_TAGS = (); }; };
+		B5F2344B1BB92BBA00C0B7CD /* ReaderInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = B5F2344A1BB92BBA00C0B7CD /* ReaderInterface.h */; settings = {ASSET_TAGS = (); }; };
 		D32B614B1935BAA800FC89B3 /* ft301u.h in Headers */ = {isa = PBXBuildFile; fileRef = D32B61441935BAA800FC89B3 /* ft301u.h */; };
 		D32B614C1935BAA800FC89B3 /* ReaderInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D32B61451935BAA800FC89B3 /* ReaderInterface.h */; };
 		D32B614D1935BAA800FC89B3 /* winscard.h in Headers */ = {isa = PBXBuildFile; fileRef = D32B61461935BAA800FC89B3 /* winscard.h */; };
@@ -63,7 +67,11 @@
 		5207A2A315E3348700C156DF /* iRockey301_ccid-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "iRockey301_ccid-Prefix.pch"; sourceTree = "<group>"; };
 		52263B291573846500CE4DCC /* libiRockey301_ccid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libiRockey301_ccid.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		52263B2C1573846500CE4DCC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		89B2BC771A089FCE00C9A8B2 /* libFTSessionController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFTSessionController.a; path = src/libFTSessionController.a; sourceTree = "<group>"; };
+		B5132B1A1BB9394600665BCD /* ft301u.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ft301u.h; path = src/ft301u.h; sourceTree = "<group>"; };
+		B5132B1B1BB9394600665BCD /* winscard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winscard.h; path = src/winscard.h; sourceTree = "<group>"; };
+		B5132B1C1BB9394600665BCD /* wintypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintypes.h; path = src/wintypes.h; sourceTree = "<group>"; };
+		B5EAEBE41BB95C11009CAA54 /* libFTSessionController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFTSessionController.a; path = src/libFTSessionController.a; sourceTree = "<group>"; };
+		B5F2344A1BB92BBA00C0B7CD /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReaderInterface.h; path = src/ReaderInterface.h; sourceTree = "<group>"; };
 		D32B61441935BAA800FC89B3 /* ft301u.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft301u.h; sourceTree = "<group>"; };
 		D32B61451935BAA800FC89B3 /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReaderInterface.h; sourceTree = "<group>"; };
 		D32B61461935BAA800FC89B3 /* winscard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = winscard.h; sourceTree = "<group>"; };
@@ -82,7 +90,7 @@
 				D33D1ECE18EA8DE80041D55E /* UIKit.framework in Frameworks */,
 				D37003DF18BC6521005CD978 /* CoreFoundation.framework in Frameworks */,
 				52263B2D1573846500CE4DCC /* Foundation.framework in Frameworks */,
-				89B2BC781A089FCE00C9A8B2 /* libFTSessionController.a in Frameworks */,
+				B5EAEBE51BB95C11009CAA54 /* libFTSessionController.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,26 +100,31 @@
 		5207A28415E333D000C156DF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				33ED7112172CCF9100268F11 /* crypto.c */,
+				B5EAEBE41BB95C11009CAA54 /* libFTSessionController.a */,
+				B5132B1A1BB9394600665BCD /* ft301u.h */,
+				B5132B1B1BB9394600665BCD /* winscard.h */,
+				B5132B1C1BB9394600665BCD /* wintypes.h */,
+				B5F2344A1BB92BBA00C0B7CD /* ReaderInterface.h */,
 				33ED7113172CCF9200268F11 /* crypto.h */,
-				33ED710E172CCF6B00268F11 /* aes.c */,
 				33ED710F172CCF6B00268F11 /* aes.h */,
-				3374951B16F9D2E800445C6F /* atr.c */,
-				335C019E16773A3700ABE095 /* DES_C.c */,
 				335C019F16773A3700ABE095 /* DES_C.h */,
 				5207A28615E333E300C156DF /* buffer.h */,
-				5207A28715E333E300C156DF /* buffer.c */,
 				5207A28815E333E300C156DF /* checksum.h */,
+				5207A28B15E333E300C156DF /* EADSessionController.h */,
+				5207A28E15E333E300C156DF /* ft_ccid.h */,
+				5207A29015E333E300C156DF /* proto-t1.h */,
+				33ED7112172CCF9100268F11 /* crypto.c */,
+				33ED710E172CCF6B00268F11 /* aes.c */,
+				3374951B16F9D2E800445C6F /* atr.c */,
+				335C019E16773A3700ABE095 /* DES_C.c */,
+				5207A28715E333E300C156DF /* buffer.c */,
 				5207A28915E333E300C156DF /* checksum.c */,
 				5207A28A15E333E300C156DF /* debug.c */,
-				5207A28B15E333E300C156DF /* EADSessionController.h */,
-				33CC95DA172BC8460007B3BD /* ReaderInterface.m */,
-				5207A28D15E333E300C156DF /* ft_ccid_cmd.m */,
-				5207A28E15E333E300C156DF /* ft_ccid.h */,
 				5207A28F15E333E300C156DF /* pps.c */,
-				5207A29015E333E300C156DF /* proto-t1.h */,
 				5207A29115E333E300C156DF /* proto-t1.c */,
 				5207A29215E333E300C156DF /* winscard.m */,
+				33CC95DA172BC8460007B3BD /* ReaderInterface.m */,
+				5207A28D15E333E300C156DF /* ft_ccid_cmd.m */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -138,7 +151,6 @@
 		52263B2B1573846500CE4DCC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				89B2BC771A089FCE00C9A8B2 /* libFTSessionController.a */,
 				D33D1ECF18EA8E2A0041D55E /* ExternalAccessory.framework */,
 				D33D1ECD18EA8DE80041D55E /* UIKit.framework */,
 				D37003DE18BC6520005CD978 /* CoreFoundation.framework */,
@@ -195,13 +207,17 @@
 				D32B614C1935BAA800FC89B3 /* ReaderInterface.h in Headers */,
 				5207A29615E333E300C156DF /* checksum.h in Headers */,
 				D32B614E1935BAA800FC89B3 /* wintypes.h in Headers */,
+				B5132B1F1BB9394600665BCD /* wintypes.h in Headers */,
 				5207A29915E333E300C156DF /* EADSessionController.h in Headers */,
 				5207A29C15E333E300C156DF /* ft_ccid.h in Headers */,
 				5207A29E15E333E300C156DF /* proto-t1.h in Headers */,
 				D32B614B1935BAA800FC89B3 /* ft301u.h in Headers */,
 				D32B614D1935BAA800FC89B3 /* winscard.h in Headers */,
 				5207A2A415E3348700C156DF /* iRockey301_ccid-Prefix.pch in Headers */,
+				B5132B1D1BB9394600665BCD /* ft301u.h in Headers */,
+				B5132B1E1BB9394600665BCD /* winscard.h in Headers */,
 				335C01A116773A3700ABE095 /* DES_C.h in Headers */,
+				B5F2344B1BB92BBA00C0B7CD /* ReaderInterface.h in Headers */,
 				33ED7111172CCF6B00268F11 /* aes.h in Headers */,
 				33ED7115172CCF9200268F11 /* crypto.h in Headers */,
 			);

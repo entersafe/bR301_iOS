@@ -29,6 +29,7 @@
 
 @implementation ReaderInterface
 
+
 - (id)init
 {
     self = [super init];
@@ -38,12 +39,12 @@
     return self;
 }
 
-- (BOOL)isReaderAttached;
+-(BOOL) isReaderAttached
 {
     return gIsOpen;
 }
 
-- (BOOL)isCardAttached;
+- (BOOL)isCardAttached
 {
     
     LONG rv;

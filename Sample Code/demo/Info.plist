@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>ICON.png</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.ftsafe.${PRODUCT_NAME:rfc1034identifier}.demo</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
