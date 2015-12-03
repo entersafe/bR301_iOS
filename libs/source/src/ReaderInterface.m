@@ -80,7 +80,7 @@
 
 - (void)  setDelegate:(id<ReaderInterfaceDelegate>)delegate
 {
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     
     [sessionController setDelegate:delegate];
     
