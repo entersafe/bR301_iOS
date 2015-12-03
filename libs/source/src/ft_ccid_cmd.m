@@ -125,7 +125,7 @@ status_t ReadSerial(unsigned int reader_index,
     
         int iRet=0;
     
-        EADSessionController *sessionController = [EADSessionController sharedController];
+        bR301SessionController *sessionController = [bR301SessionController sharedController];
         gIsReadData = 1;
         iRet = [sessionController readData: buffer withbytesToRead:length];
         gIsReadData = 0;
@@ -173,7 +173,7 @@ status_t WriteSerial(unsigned int reader_index, unsigned int length,
     @try {
                int iRet=0;
     
-                EADSessionController *sessionController = [EADSessionController sharedController];
+                bR301SessionController *sessionController = [bR301SessionController sharedController];
        
                 iRet = [sessionController writeData: buffer withLength:length];
         
@@ -219,7 +219,7 @@ RESPONSECODE CmdGetDevVer(unsigned int reader_index,char *firmwareRevision,char 
         return IFD_ERROR_TAG;
     }
     
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     NSString *tmp=[[sessionController accessory] firmwareRevision];
     if (iR301_or_bR301 == 0)
     {

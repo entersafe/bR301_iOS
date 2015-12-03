@@ -132,7 +132,7 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
     pthread_mutex_lock(&CommunicatonMutex);
     eStablishContextCount = eStablishContextCount + 1;
 
-    [[EADSessionController sharedController] RegisterAccessoryConnectNotification];
+    [[bR301SessionController sharedController] RegisterAccessoryConnectNotification];
     pthread_mutex_unlock(&CommunicatonMutex);
     *phContext = (SCARDCONTEXT)ccid_descriptor;
     return SCARD_S_SUCCESS;
@@ -158,7 +158,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
     eStablishContextCount = eStablishContextCount - 1;
     if (eStablishContextCount <= 0)
     {
-        [[EADSessionController sharedController] UnRegisterAccessoryConnectNotification];
+        [[bR301SessionController sharedController] UnRegisterAccessoryConnectNotification];
       
     }
     pthread_mutex_unlock(&CommunicatonMutex);
@@ -200,7 +200,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext,
 		return SCARD_E_INVALID_PARAMETER;
     }
     pthread_mutex_lock(&CommunicatonMutex);
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     pthread_mutex_unlock(&CommunicatonMutex);
     if(0 ==  [sessionController identifyAccessoryCount])
     {
@@ -847,7 +847,7 @@ LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRev
     long rv=0;
     
     pthread_mutex_lock(&CommunicatonMutex);
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     if (sessionController.identifyAccessoryCount == 0 ){
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
