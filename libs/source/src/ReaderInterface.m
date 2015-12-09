@@ -24,7 +24,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ReaderInterface.h"
-#import "EADSessionController.h"
+#import "bR301SessionController.h"
 #import "ft_ccid.h"
 
 @implementation ReaderInterface

@@ -34,7 +34,7 @@
 #include "proto-t1.h"
 #include  <pthread.h>
 
-#import "EADSessionController.h"
+#import "bR301SessionController.h"
 
 #define FT_IR301_DEBUG
 

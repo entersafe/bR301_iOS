@@ -87,7 +87,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ft_ccid.h"
-#import "EADSessionController.h"
+#import "bR301SessionController.h"
 
 extern unsigned int g_dwTimeOut;
 extern unsigned int iR301_or_bR301;
