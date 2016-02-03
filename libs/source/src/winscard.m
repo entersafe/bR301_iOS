@@ -96,7 +96,7 @@ extern pthread_mutex_t CommunicatonMutex;
 
 unsigned int isDukpt = 0;
 
-char Ft_iR301U_Version[3]={0x01,0x31,0x01};
+char Ft_iR301U_Version[3]={0x01,0x31,0x02};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
