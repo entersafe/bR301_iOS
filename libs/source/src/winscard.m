@@ -87,7 +87,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ft_ccid.h"
-#import "EADSessionController.h"
+#import "bR301SessionController.h"
 
 extern unsigned int g_dwTimeOut;
 extern unsigned int iR301_or_bR301;
@@ -96,7 +96,7 @@ extern pthread_mutex_t CommunicatonMutex;
 
 unsigned int isDukpt = 0;
 
-char Ft_iR301U_Version[3]={0x01,0x30,0x00};
+char Ft_iR301U_Version[3]={0x01,0x31,0x02};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
@@ -107,6 +107,7 @@ g_rgSCardRawPci={T_RAW,0};
 
 
 #pragma mark PCSC APIs
+
 
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
                            /*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
@@ -837,6 +838,12 @@ LONG SCardCancel(SCARDCONTEXT hContext)
 {
     
     return SCARD_S_SUCCESS;
+}
+
+PCSC_API  LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
+{
+    //We haven't implement this function
+    return 0;
 }
 
 
