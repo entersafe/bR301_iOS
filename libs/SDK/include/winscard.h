@@ -147,6 +147,8 @@ extern "C"
 
 	PCSC_API LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 		/*@out@*/ LPBYTE pbAttr, LPDWORD pcbAttrLen);
+    PCSC_API  LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout);
+    
     
     
 #ifdef __cplusplus

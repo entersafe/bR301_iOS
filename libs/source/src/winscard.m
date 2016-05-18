@@ -87,7 +87,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ft_ccid.h"
-#import "EADSessionController.h"
+#import "bR301SessionController.h"
 
 extern unsigned int g_dwTimeOut;
 extern unsigned int iR301_or_bR301;
@@ -95,9 +95,11 @@ extern BOOL bIsDidEnterBackground;
 extern pthread_mutex_t CommunicatonMutex;
 
 unsigned int isDukpt = 0;
+
+char Ft_iR301U_Version[3]={0x01,0x31,0x02};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
-char Ft_iR301U_Version[3] = {0x01,0x29,0x02};
+
 
 SCARD_IO_REQUEST g_rgSCardT0Pci={T_0,0}, g_rgSCardT1Pci={T_1,0},
 g_rgSCardRawPci={T_RAW,0};
@@ -105,6 +107,7 @@ g_rgSCardRawPci={T_RAW,0};
 
 
 #pragma mark PCSC APIs
+
 
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
                            /*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
@@ -121,15 +124,18 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
     }
    
    
-    pthread_mutex_lock(&CommunicatonMutex);
+
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     ccid_descriptor->dwMaxCCIDMessageLength = 272;
     ccid_descriptor->dwSlotStatus = IFD_ICC_NOT_PRESENT;
-    eStablishContextCount = eStablishContextCount + 1;
-    *phContext = (SCARDCONTEXT)ccid_descriptor;
-    [[EADSessionController sharedController] RegisterAccessoryConnectNotification];
-    pthread_mutex_unlock(&CommunicatonMutex);
+    
 
+    pthread_mutex_lock(&CommunicatonMutex);
+    eStablishContextCount = eStablishContextCount + 1;
+
+    [[bR301SessionController sharedController] RegisterAccessoryConnectNotification];
+    pthread_mutex_unlock(&CommunicatonMutex);
+    *phContext = (SCARDCONTEXT)ccid_descriptor;
     return SCARD_S_SUCCESS;
 }
 
@@ -153,7 +159,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
     eStablishContextCount = eStablishContextCount - 1;
     if (eStablishContextCount <= 0)
     {
-        [[EADSessionController sharedController] UnRegisterAccessoryConnectNotification];
+        [[bR301SessionController sharedController] UnRegisterAccessoryConnectNotification];
       
     }
     pthread_mutex_unlock(&CommunicatonMutex);
@@ -195,7 +201,7 @@ LONG SCardListReaders(SCARDCONTEXT hContext,
 		return SCARD_E_INVALID_PARAMETER;
     }
     pthread_mutex_lock(&CommunicatonMutex);
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     pthread_mutex_unlock(&CommunicatonMutex);
     if(0 ==  [sessionController identifyAccessoryCount])
     {
@@ -225,6 +231,14 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
     unsigned char buf[256]={0};
     unsigned int len1 =sizeof(buf);
     long ReturnValue = 0;
+    
+    //////////////////////////////////////////////////////
+    if ( NO == gIsOpen)
+    {
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    /////////////////////////////////////////////////////
+    
 
     if (0 ==  hContext)
     {
@@ -258,6 +272,7 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
 
     if(IFD_SUCCESS != ReturnValue)
     {
+        //add if poweron faile clear atr
         CcidSlots->nATRLength = 0;
         *CcidSlots->pcATRBuffer = '\0';
         pthread_mutex_unlock(&CommunicatonMutex);
@@ -277,6 +292,7 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
     }
 
 
+    /* initialise T=1 context */
     (void)t1_init(&(CcidSlots->t1), 0);
     Scrd_Negotiate(0);
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
@@ -321,7 +337,14 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
     long ReturnValue = 0;
     
-    if (0 ==  hCard)
+    //////////////////////////////////////////////////////
+    if ( NO == gIsOpen)
+    {
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    /////////////////////////////////////////////////////
+
+    if (0 ==  hCard) 
     {
         return SCARD_E_INVALID_HANDLE;
     }
@@ -354,10 +377,9 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
         return SCARD_S_SUCCESS;
     }
     
-    //    if (eShCardHandleCount > 0)
-    {
-        eShCardHandleCount = eShCardHandleCount - 1;
-    }
+
+    eShCardHandleCount = eShCardHandleCount - 1;
+
     
     if (eShCardHandleCount > 0)
     {
@@ -431,7 +453,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
     {
         g_dwTimeOut= 600;
     }
-    else if (iR301_or_bR301 == 1)
+    if (iR301_or_bR301 == 1)
     {
         g_dwTimeOut = 1500;
     }
@@ -688,6 +710,14 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
     unsigned char buf[CMD_BUF_SIZE];
     unsigned int len =sizeof(buf);
     
+    //////////////////////////////////////////////////////
+    if ( NO == gIsOpen)
+    {
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    /////////////////////////////////////////////////////
+
+
     if (0 ==  hCard)
     {
         return SCARD_E_INVALID_HANDLE;
@@ -810,6 +840,12 @@ LONG SCardCancel(SCARDCONTEXT hContext)
     return SCARD_S_SUCCESS;
 }
 
+PCSC_API  LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
+{
+    //We haven't implement this function
+    return 0;
+}
+
 
 
 #pragma mark duktp
@@ -818,7 +854,7 @@ LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRev
     long rv=0;
     
     pthread_mutex_lock(&CommunicatonMutex);
-    EADSessionController *sessionController = [EADSessionController sharedController];
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
     if (sessionController.identifyAccessoryCount == 0 ){
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
