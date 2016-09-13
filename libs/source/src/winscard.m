@@ -88,6 +88,7 @@
 #include <string.h>
 #include "ft_ccid.h"
 #import "bR301SessionController.h"
+#import "ft301u.h"
 
 extern unsigned int g_dwTimeOut;
 extern unsigned int iR301_or_bR301;
@@ -96,7 +97,11 @@ extern pthread_mutex_t CommunicatonMutex;
 
 unsigned int isDukpt = 0;
 
-char Ft_iR301U_Version[3]={0x01,0x31,0x02};
+
+//1.31.3 - Solve the CPU usage issue
+//1.31.4 - Add get reader type API
+//1.31.5 - add auto pps
+char Ft_iR301U_Version[3]={0x01,0x31,0x05};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
@@ -107,7 +112,6 @@ g_rgSCardRawPci={T_RAW,0};
 
 
 #pragma mark PCSC APIs
-
 
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
                            /*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
@@ -128,14 +132,13 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     ccid_descriptor->dwMaxCCIDMessageLength = 272;
     ccid_descriptor->dwSlotStatus = IFD_ICC_NOT_PRESENT;
-    
-
-    pthread_mutex_lock(&CommunicatonMutex);
     eStablishContextCount = eStablishContextCount + 1;
-
-    [[bR301SessionController sharedController] RegisterAccessoryConnectNotification];
-    pthread_mutex_unlock(&CommunicatonMutex);
+	
     *phContext = (SCARDCONTEXT)ccid_descriptor;
+	
+	[[bR301SessionController sharedController] RegisterAccessoryConnectNotification];
+    pthread_mutex_unlock(&CommunicatonMutex);
+
     return SCARD_S_SUCCESS;
 }
 
@@ -159,8 +162,7 @@ LONG SCardReleaseContext(SCARDCONTEXT hContext)
     eStablishContextCount = eStablishContextCount - 1;
     if (eStablishContextCount <= 0)
     {
-        [[bR301SessionController sharedController] UnRegisterAccessoryConnectNotification];
-      
+		[[bR301SessionController sharedController] UnRegisterAccessoryConnectNotification];
     }
     pthread_mutex_unlock(&CommunicatonMutex);
 
@@ -202,7 +204,8 @@ LONG SCardListReaders(SCARDCONTEXT hContext,
     }
     pthread_mutex_lock(&CommunicatonMutex);
     bR301SessionController *sessionController = [bR301SessionController sharedController];
-    pthread_mutex_unlock(&CommunicatonMutex);
+	
+	pthread_mutex_unlock(&CommunicatonMutex);
     if(0 ==  [sessionController identifyAccessoryCount])
     {
         return SCARD_E_READER_UNAVAILABLE;
@@ -231,14 +234,13 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
     unsigned char buf[256]={0};
     unsigned int len1 =sizeof(buf);
     long ReturnValue = 0;
-    
-    //////////////////////////////////////////////////////
+	
+	 //////////////////////////////////////////////////////
     if ( NO == gIsOpen)
     {
         return SCARD_E_READER_UNAVAILABLE;
     }
     /////////////////////////////////////////////////////
-    
 
     if (0 ==  hContext)
     {
@@ -272,7 +274,7 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
 
     if(IFD_SUCCESS != ReturnValue)
     {
-        //add if poweron faile clear atr
+		//add if power on failed then clear atr
         CcidSlots->nATRLength = 0;
         *CcidSlots->pcATRBuffer = '\0';
         pthread_mutex_unlock(&CommunicatonMutex);
@@ -291,8 +293,7 @@ LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
         }
     }
 
-
-    /* initialise T=1 context */
+	/* initialise T=1 context */
     (void)t1_init(&(CcidSlots->t1), 0);
     Scrd_Negotiate(0);
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
@@ -337,14 +338,12 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
     long ReturnValue = 0;
     
-    //////////////////////////////////////////////////////
-    if ( NO == gIsOpen)
+	if ( NO == gIsOpen)
     {
         return SCARD_E_READER_UNAVAILABLE;
     }
-    /////////////////////////////////////////////////////
-
-    if (0 ==  hCard) 
+	
+    if (0 ==  hCard)
     {
         return SCARD_E_INVALID_HANDLE;
     }
@@ -710,14 +709,12 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
     unsigned char buf[CMD_BUF_SIZE];
     unsigned int len =sizeof(buf);
     
-    //////////////////////////////////////////////////////
     if ( NO == gIsOpen)
     {
         return SCARD_E_READER_UNAVAILABLE;
     }
-    /////////////////////////////////////////////////////
-
-
+   
+	
     if (0 ==  hCard)
     {
         return SCARD_E_INVALID_HANDLE;
@@ -846,8 +843,6 @@ PCSC_API  LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
     return 0;
 }
 
-
-
 #pragma mark duktp
 LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRevision)
 {
@@ -855,7 +850,7 @@ LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRev
     
     pthread_mutex_lock(&CommunicatonMutex);
     bR301SessionController *sessionController = [bR301SessionController sharedController];
-    if (sessionController.identifyAccessoryCount == 0 ){
+	if (sessionController.identifyAccessoryCount == 0 ){
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
@@ -914,14 +909,16 @@ LONG FtDukptSetEncMod(SCARDHANDLE hCard,
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
-
+    
     rv= CmdSetEncMod(0,bEncrypt,bEncFunc,bEncType);
     pthread_mutex_unlock(&CommunicatonMutex);
     
     if (IFD_SUCCESS == rv) 
     {
-        if (bEncrypt) {
+        if (bEncrypt && (!bEncType)) {
              isDukpt = 1;
+        }else{
+            isDukpt = 0;
         }
         return SCARD_S_SUCCESS;
     }
@@ -974,6 +971,59 @@ void FtGetLibVersion (char *buffer)
     sprintf(buffer, " ST:%01x.%01x.%01x",Ft_iR301U_Version[0],Ft_iR301U_Version[1],Ft_iR301U_Version[2]);
 }
 
+/**
+ *  get the current Reader type
+ *
+ *  @param readerType
+ *
+ *  @return errorCode
+ */
+LONG FtGetCurrentReaderType(unsigned int *readerType)
+{
+    
+    long returnValue = -1;
+    unsigned char temp[64] = {0};
+    unsigned int nlength=sizeof(temp);
+    
+    if (gIsOpen == 0) {
+        
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    
+    if (readerType == NULL) {
+        
+        return SCARD_E_INVALID_PARAMETER;
+    }
+    
+    //bR301
+    if (iR301_or_bR301 == 1) {
+        *readerType = READER_bR301;
+        return SCARD_S_SUCCESS;
+    }
+    
+    pthread_mutex_lock(&CommunicatonMutex);
+    
+    *readerType = READER_UNKOWN;
+    returnValue = CmdGetDevInfo(0,&nlength , temp);
+    
+    pthread_mutex_unlock(&CommunicatonMutex);
+    
+    if (IFD_SUCCESS == returnValue) {
+        
+        if (temp[0] == FT_READER_UA || temp[0] == FT_READER_UB || temp[0] == FT_READER_UC
+            || temp[0] == FT_READER_UC_B || temp[0] == FT_READER_UM || temp[0] == FT_READER_UD) {
+            *readerType = READER_iR301U_DOCK;
+        }
+        
+        if (temp[0] == FT_READER_UB_LT || temp[0] == FT_READER_UC_LT ||
+            temp[0] == FT_READER_UC_LT_B || temp[0] == FT_READER_UD_LT) {
+            *readerType = READER_iR301U_LIGHTING;
+        }
+    }
+    
+    return (int)returnValue;
+
+}
 LONG FtGetSerialNum(SCARDHANDLE hCard, unsigned int  length,
                               char * buffer)
 {
@@ -1068,9 +1118,6 @@ LONG FtReadFlash(SCARDHANDLE hCard,unsigned char bOffset, unsigned char blength,
         return SCARD_F_COMM_ERROR;
     }
 }
-
-#pragma mark feitian's private sle4442 command
-
 
 LONG FtSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 {

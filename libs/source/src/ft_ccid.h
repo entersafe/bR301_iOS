@@ -39,10 +39,29 @@ extern "C" {
 typedef long RESPONSECODE;
 #define CCID_DRIVER_MAX_READERS 1
 
-#define FT_READER_DEFAULT 	0x00
-#define FT_READER_UA 		0x01
-#define FT_READER_UB 		0x02
-#define FT_READER_UB_LT 	0x03
+typedef enum READERTYPE{
+    READER_UNKOWN = 0,
+    READER_bR301,
+    READER_iR301U_DOCK,
+    READER_iR301U_LIGHTING
+    
+}READERTYPE;
+
+typedef enum FTREADER_INTERNAL
+{
+    FT_READER_DEFAULT = 0x00,
+    FT_READER_UA      = 0x01,
+    FT_READER_UB      = 0x02,
+    FT_READER_UB_LT   = 0x03,
+    FT_READER_UC      = 0x04,
+    FT_READER_UC_LT   = 0x05,
+    FT_READER_UC_B    = 0x06,
+    FT_READER_UC_LT_B = 0x07,
+    FT_READER_UM      = 0x08,
+    FT_READER_UD      = 0x09,
+    FT_READER_UD_LT   = 0x0A,
+    
+}FTREADER_INTERNAL;
 
 
 #define ReadPort ReadSerial
