@@ -10,20 +10,26 @@
 #import <ExternalAccessory/ExternalAccessory.h>
 #import "ReaderInterface.h"
 
-@interface bR301SessionController : NSObject <EAAccessoryDelegate, NSStreamDelegate> {
-    
-    //    id<ReaderInterfaceDelegate> detegate;
+@interface bR301SessionController :
+NSObject <EAAccessoryDelegate, NSStreamDelegate> {
+
+	//    id<ReaderInterfaceDelegate> detegate;
 }
 
 + (bR301SessionController *)sharedController;
 
-- (void)  setDelegate:(id<ReaderInterfaceDelegate>)Delegate;
+- (void)  setDelegate:
+(id<ReaderInterfaceDelegate>)Delegate;
 
 -(void) RegisterAccessoryConnectNotification;
 -(void) UnRegisterAccessoryConnectNotification;
-- (int)identifyAccessoryCount;
-- (int)writeData:(unsigned char *)data withLength:(unsigned int) len;
-- (int)readData:(unsigned char *) data withbytesToRead:(unsigned int*)bytesToRead;
+-(int)identifyAccessoryCount;
+- (int)writeData:
+(unsigned char *)data withLength:
+(unsigned int) len;
+- (int)readData:
+(unsigned char *) data withbytesToRead:
+(unsigned int*)bytesToRead;
 
 
 //@property (atomic,strong) NSRecursiveLock *theLock;//atomic多线程访问互斥

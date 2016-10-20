@@ -31,7 +31,7 @@ ct_buf_get(ct_buf_t *bp, void *mem, unsigned int len)
 		return -1;
 	if (mem)
 		memcpy(mem, bp->base + bp->head, len);
-    
+
 	bp->head += len;
 	return len;
 }
@@ -45,7 +45,7 @@ ct_buf_put(ct_buf_t *bp, const void *mem, unsigned int len)
 	}
 	if (mem)
 		memcpy(bp->base + bp->tail, mem, len);
-    
+
 	bp->tail += len;
 	return len;
 }
