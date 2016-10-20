@@ -127,7 +127,7 @@ LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
         return SCARD_E_INVALID_PARAMETER ;
     }
    
-   
+    pthread_mutex_lock(&CommunicatonMutex);
 
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     ccid_descriptor->dwMaxCCIDMessageLength = 272;
