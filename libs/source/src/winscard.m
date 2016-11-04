@@ -101,7 +101,8 @@ unsigned int isDukpt = 0;
 //1.31.3 - Solve the CPU usage issue
 //1.31.4 - Add get reader type API
 //1.31.5 - add auto pps
-char Ft_iR301U_Version[3]= {0x01,0x31,0x05};
+//1.31.6 - add customer OEM reader support
+char Ft_iR301U_Version[3]={0x01,0x31,0x06};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
