@@ -102,7 +102,8 @@ unsigned int isDukpt = 0;
 //1.31.4 - Add get reader type API
 //1.31.5 - add auto pps
 //1.31.6 - add customer OEM reader support
-char Ft_iR301U_Version[3]={0x01,0x31,0x06};
+//1.31.7 - fix bug while in close session, the behave is using bluetooth printer with bR301 and iR301, the reader session will close. 
+char Ft_iR301U_Version[3]={0x01,0x31,0x07};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
