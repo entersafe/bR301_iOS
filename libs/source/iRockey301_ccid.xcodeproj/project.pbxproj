@@ -32,7 +32,7 @@
 		B5132B1E1BB9394600665BCD /* winscard.h in Headers */ = {isa = PBXBuildFile; fileRef = B5132B1B1BB9394600665BCD /* winscard.h */; };
 		B5132B1F1BB9394600665BCD /* wintypes.h in Headers */ = {isa = PBXBuildFile; fileRef = B5132B1C1BB9394600665BCD /* wintypes.h */; };
 		B52B69A31D7831BC00D83CDC /* bR301SessionController.h in Headers */ = {isa = PBXBuildFile; fileRef = B52B69A21D7831BC00D83CDC /* bR301SessionController.h */; };
-		B557B4CD1E5D76BE000C9CEC /* libFTSessionController_release.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B557B4CC1E5D76BE000C9CEC /* libFTSessionController_release.a */; };
+		B557B4CF1E5D7F0A000C9CEC /* libFTSessionController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B557B4CE1E5D7F0A000C9CEC /* libFTSessionController.a */; };
 		B5F2344B1BB92BBA00C0B7CD /* ReaderInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = B5F2344A1BB92BBA00C0B7CD /* ReaderInterface.h */; };
 		D32B614B1935BAA800FC89B3 /* ft301u.h in Headers */ = {isa = PBXBuildFile; fileRef = D32B61441935BAA800FC89B3 /* ft301u.h */; };
 		D32B614C1935BAA800FC89B3 /* ReaderInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = D32B61451935BAA800FC89B3 /* ReaderInterface.h */; };
@@ -70,7 +70,7 @@
 		B5132B1B1BB9394600665BCD /* winscard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winscard.h; path = src/winscard.h; sourceTree = "<group>"; };
 		B5132B1C1BB9394600665BCD /* wintypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintypes.h; path = src/wintypes.h; sourceTree = "<group>"; };
 		B52B69A21D7831BC00D83CDC /* bR301SessionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bR301SessionController.h; path = src/bR301SessionController.h; sourceTree = "<group>"; };
-		B557B4CC1E5D76BE000C9CEC /* libFTSessionController_release.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFTSessionController_release.a; path = src/libFTSessionController_release.a; sourceTree = "<group>"; };
+		B557B4CE1E5D7F0A000C9CEC /* libFTSessionController.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFTSessionController.a; path = src/libFTSessionController.a; sourceTree = "<group>"; };
 		B5F2344A1BB92BBA00C0B7CD /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReaderInterface.h; path = src/ReaderInterface.h; sourceTree = "<group>"; };
 		D32B61441935BAA800FC89B3 /* ft301u.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft301u.h; sourceTree = "<group>"; };
 		D32B61451935BAA800FC89B3 /* ReaderInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReaderInterface.h; sourceTree = "<group>"; };
@@ -86,10 +86,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B557B4CF1E5D7F0A000C9CEC /* libFTSessionController.a in Frameworks */,
 				D33D1ED018EA8E2A0041D55E /* ExternalAccessory.framework in Frameworks */,
 				D33D1ECE18EA8DE80041D55E /* UIKit.framework in Frameworks */,
 				D37003DF18BC6521005CD978 /* CoreFoundation.framework in Frameworks */,
-				B557B4CD1E5D76BE000C9CEC /* libFTSessionController_release.a in Frameworks */,
 				52263B2D1573846500CE4DCC /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -139,7 +139,7 @@
 		52263B2B1573846500CE4DCC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B557B4CC1E5D76BE000C9CEC /* libFTSessionController_release.a */,
+				B557B4CE1E5D7F0A000C9CEC /* libFTSessionController.a */,
 				D33D1ECF18EA8E2A0041D55E /* ExternalAccessory.framework */,
 				D33D1ECD18EA8DE80041D55E /* UIKit.framework */,
 				D37003DE18BC6520005CD978 /* CoreFoundation.framework */,
