@@ -26,6 +26,7 @@
 - (int)readData:(unsigned char *) data withbytesToRead:(unsigned int*)bytesToRead;
 
 
+//@property (atomic,strong) NSRecursiveLock *theLock;//atomic多线程访问互斥
 @property (nonatomic, strong) EAAccessory *accessory;
 @property (nonatomic, strong) NSString *protocolString;
 @property (nonatomic, strong) EASession *session;

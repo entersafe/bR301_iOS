@@ -30,50 +30,53 @@
 #define MODE_ENCRYPT                1
 #define MODE_DECRYPT                0
 
-typedef struct st_aes_cfb_context {
-	unsigned char    inter_in[AES_BLOCK_SIZE+1];
-	unsigned char    inter_out[AES_BLOCK_SIZE+1];
-	int   szBlock;
-	int   k;
+typedef struct st_aes_cfb_context
+{
+    unsigned char    inter_in[AES_BLOCK_SIZE+1];
+    unsigned char    inter_out[AES_BLOCK_SIZE+1];
+    int   szBlock;
+    int   k;
 } AES_CFB_CONTEXT, AES_CFB_CTX;
 
-typedef struct st_aes_ofb_context {
-	unsigned char    interBlk[AES_BLOCK_SIZE];
-	int   szBlock;
+typedef struct st_aes_ofb_context
+{
+    unsigned char    interBlk[AES_BLOCK_SIZE];
+    int   szBlock;
 } AES_OFB_CONTEXT, AES_OFB_CTX;
 
 
-typedef struct st_aes_ctr_context {
-	unsigned char    interBlk[AES_BLOCK_SIZE];
-	int   szBlock;
+typedef struct st_aes_ctr_context
+{
+    unsigned char    interBlk[AES_BLOCK_SIZE];
+    int   szBlock;
 } AES_CTR_CONTEXT, AES_CTR_CTX;
 
 
 #ifdef  __cplusplus
-extern "C" {
+extern "C"{
 #endif
+    
+/*****************************************************************************
+ Prototype    : AES_encrypt
+ Description  : AES encryption
+ Param        : unsigned char* plaintext   [in ] the password in plain text£¨buffer size is 16 bytes
+ Param        : unsigned char* ciphertext  [out] Password ciphertext output£¨buffer size is 16 bytes
+ Param        : unsigned char* key         [in ] key £¨buffer size is keyLen bytes
+ Param        : int szKey                  [in ] size of key,16/24/32
+ Return Value : none
+ *****************************************************************************/
+extern void Ft_iR301U_AES_encrypt( unsigned char * plaintext, unsigned char * ciphertext, unsigned char * key, int szKey);
 
-	/*****************************************************************************
-	 Prototype    : AES_encrypt
-	 Description  : AES encryption
-	 Param        : unsigned char* plaintext   [in ] the password in plain text£¨buffer size is 16 bytes
-	 Param        : unsigned char* ciphertext  [out] Password ciphertext output£¨buffer size is 16 bytes
-	 Param        : unsigned char* key         [in ] key £¨buffer size is keyLen bytes
-	 Param        : int szKey                  [in ] size of key,16/24/32
-	 Return Value : none
-	 *****************************************************************************/
-	extern void Ft_iR301U_AES_encrypt( unsigned char * plaintext, unsigned char * ciphertext, unsigned char * key, int szKey);
-
-	/*****************************************************************************
-	 Prototype    : AES_decrypt
-	 Description  : AES decryption
-	 Param        : unsigned char* plaintext   [in ] the password in plain text£¨buffer size is 16 bytes
-	 Param        : unsigned char* ciphertext  [out] Password ciphertext output£¨buffer size is 16 bytes
-	 Param        : unsigned char* key         [in ] key £¨buffer size is keyLen bytes
-	 Param        : int szKey                  [in ] size of key,16/24/32
-	 Return Value : none
-	 *****************************************************************************/
-	extern void Ft_iR301U_AES_decrypt( unsigned char * ciphertext, unsigned char * plaintext, unsigned char * key, int szKey);
+/*****************************************************************************
+ Prototype    : AES_decrypt
+ Description  : AES decryption
+ Param        : unsigned char* plaintext   [in ] the password in plain text£¨buffer size is 16 bytes
+ Param        : unsigned char* ciphertext  [out] Password ciphertext output£¨buffer size is 16 bytes
+ Param        : unsigned char* key         [in ] key £¨buffer size is keyLen bytes
+ Param        : int szKey                  [in ] size of key,16/24/32
+ Return Value : none
+ *****************************************************************************/
+extern void Ft_iR301U_AES_decrypt( unsigned char * ciphertext, unsigned char * plaintext, unsigned char * key, int szKey);
 
 
 #ifdef  __cplusplus

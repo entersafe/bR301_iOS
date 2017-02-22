@@ -36,36 +36,37 @@
 extern "C" {
 #endif
 
-	typedef long RESPONSECODE;
+typedef long RESPONSECODE;
 #define CCID_DRIVER_MAX_READERS 1
 
-	typedef enum READERTYPE {
-		READER_UNKOWN = 0,
-		READER_bR301,
-		READER_iR301U_DOCK,
-		READER_iR301U_LIGHTING
+typedef enum READERTYPE{
+    READER_UNKOWN = 0,
+    READER_bR301,
+    READER_iR301U_DOCK,
+    READER_iR301U_LIGHTING
+    
+}READERTYPE;
 
-	} READERTYPE;
-
-	typedef enum FTREADER_INTERNAL {
-		FT_READER_DEFAULT = 0x00,
-		FT_READER_UA      = 0x01,
-		FT_READER_UB      = 0x02,
-		FT_READER_UB_LT   = 0x03,
-		FT_READER_UC      = 0x04,
-		FT_READER_UC_LT   = 0x05,
-		FT_READER_UC_B    = 0x06,
-		FT_READER_UC_LT_B = 0x07,
-		FT_READER_UM      = 0x08,
-		FT_READER_UD      = 0x09,
-		FT_READER_UD_LT   = 0x0A,
-
-	} FTREADER_INTERNAL;
+typedef enum FTREADER_INTERNAL
+{
+    FT_READER_DEFAULT = 0x00,
+    FT_READER_UA      = 0x01,
+    FT_READER_UB      = 0x02,
+    FT_READER_UB_LT   = 0x03,
+    FT_READER_UC      = 0x04,
+    FT_READER_UC_LT   = 0x05,
+    FT_READER_UC_B    = 0x06,
+    FT_READER_UC_LT_B = 0x07,
+    FT_READER_UM      = 0x08,
+    FT_READER_UD      = 0x09,
+    FT_READER_UD_LT   = 0x0A,
+    
+}FTREADER_INTERNAL;
 
 
 #define ReadPort ReadSerial
 #define WritePort WriteSerial
-
+    
 //#ifndef BOOL
 //#define BOOL signed char
 //#endif
@@ -73,28 +74,28 @@ extern "C" {
 //#ifndef TRUE
 //#define TRUE 1
 //#endif
-//
+//    
 //#ifndef FALSE
 //#define FALSE 0
 //#endif
+    
 
 
-
-	/* Protocols */
+/* Protocols */
 #define T_0 	0
 #define T_1 	1
 #define T_RAW 3
-	/* Default communication read timeout in milliseconds */
+/* Default communication read timeout in milliseconds */
 
-#define DEFAULT_COM_READ_TIMEOUT (6000)
+#define DEFAULT_COM_READ_TIMEOUT (6000)    
 
-	/* bInterfaceProtocol for ICCD */
+/* bInterfaceProtocol for ICCD */
 #define PROTOCOL_CCID		0	/* plain CCID */
 #define PROTOCOL_ICCD_A	1	/* ICCD Version A */
 #define PROTOCOL_ICCD_B	2	/* ICCD Version B */
 
 
-	/* Features from dwFeatures */
+/* Features from dwFeatures */
 #define CCID_CLASS_AUTO_CONF_ATR	0x00000002
 #define CCID_CLASS_AUTO_VOLTAGE		0x00000008
 #define CCID_CLASS_AUTO_BAUD		0x00000020
@@ -107,7 +108,7 @@ extern "C" {
 #define CCID_CLASS_EXTENDED_APDU	0x00040000
 #define CCID_CLASS_EXCHANGE_MASK	0x00070000
 
-	/* Features from bPINSupport */
+/* Features from bPINSupport */
 #define CCID_CLASS_PIN_VERIFY		0x01
 #define CCID_CLASS_PIN_MODIFY		0x02
 
@@ -116,117 +117,118 @@ extern "C" {
 #define MAX_BUFFER_SIZE_ENC     1024
 #define CMD_BUF_SIZE MAX_BUFFER_SIZE_EXTENDED
 #define CMD_BUF_SIZE_EACH (MAX_BUFFER_SIZE_ENC+10)
+    
+typedef enum {
+	STATUS_NO_SUCH_DEVICE        = 0xF9,
+	STATUS_SUCCESS               = 0xFA,
+	STATUS_UNSUCCESSFUL          = 0xFB,
+	STATUS_COMM_ERROR            = 0xFC,
+	STATUS_DEVICE_PROTOCOL_ERROR = 0xFD,
+	STATUS_COMM_NAK              = 0xFE,
+	STATUS_SECONDARY_SLOT        = 0xFF
+} status_t;
 
-	typedef enum {
-		STATUS_NO_SUCH_DEVICE        = 0xF9,
-		STATUS_SUCCESS               = 0xFA,
-		STATUS_UNSUCCESSFUL          = 0xFB,
-		STATUS_COMM_ERROR            = 0xFC,
-		STATUS_DEVICE_PROTOCOL_ERROR = 0xFD,
-		STATUS_COMM_NAK              = 0xFE,
-		STATUS_SECONDARY_SLOT        = 0xFF
-	} status_t;
+typedef struct
+{
+	/*
+	 * CCID Sequence number
+	 */
+	unsigned char real_bSeq;
 
-	typedef struct {
-		/*
-		 * CCID Sequence number
-		 */
-		unsigned char real_bSeq;
+	/*
+	 * VendorID << 16 + ProductID
+	 */
+	int readerID;
 
-		/*
-		 * VendorID << 16 + ProductID
-		 */
-		int readerID;
+	/*
+	 * Maximum message length
+	 */
+	unsigned int dwMaxCCIDMessageLength;
 
-		/*
-		 * Maximum message length
-		 */
-		unsigned int dwMaxCCIDMessageLength;
+	/*
+	 * Maximum IFSD
+	 */
+	int dwMaxIFSD;
 
-		/*
-		 * Maximum IFSD
-		 */
-		int dwMaxIFSD;
+	/*
+	 * Features supported by the reader (directly from Class Descriptor)
+	 */
+	int dwFeatures;
 
-		/*
-		 * Features supported by the reader (directly from Class Descriptor)
-		 */
-		int dwFeatures;
+	/*
+	 * PIN support of the reader (directly from Class Descriptor)
+	 */
+	char bPINSupport;
+	
+	/*
+	 * Display dimensions of the reader (directly from Class Descriptor)
+	 */
+	unsigned int wLcdLayout;
 
-		/*
-		 * PIN support of the reader (directly from Class Descriptor)
-		 */
-		char bPINSupport;
+	/*
+	 * Default Clock
+	 */
+	int dwDefaultClock;
 
-		/*
-		 * Display dimensions of the reader (directly from Class Descriptor)
-		 */
-		unsigned int wLcdLayout;
+	/*
+	 * Max Data Rate
+	 */
+	unsigned int dwMaxDataRate;
 
-		/*
-		 * Default Clock
-		 */
-		int dwDefaultClock;
+	/*
+	 * Number of available slots
+	 */
+	char bMaxSlotIndex;
 
-		/*
-		 * Max Data Rate
-		 */
-		unsigned int dwMaxDataRate;
+	/*
+	 * Slot in use
+	 */
+	char bCurrentSlotIndex;
 
-		/*
-		 * Number of available slots
-		 */
-		char bMaxSlotIndex;
+	/*
+	 * The array of data rates supported by the reader
+	 */
+	unsigned int *arrayOfSupportedDataRates;
 
-		/*
-		 * Slot in use
-		 */
-		char bCurrentSlotIndex;
+	/*
+	 * Read communication port timeout
+	 * value is milliseconds
+	 * this value can evolve dynamically if card request it (time processing).
+	 */
+	unsigned int readTimeout;
 
-		/*
-		 * The array of data rates supported by the reader
-		 */
-		unsigned int *arrayOfSupportedDataRates;
+	/*
+	 * Card protocol
+	 */
+	int cardProtocol;
 
-		/*
-		 * Read communication port timeout
-		 * value is milliseconds
-		 * this value can evolve dynamically if card request it (time processing).
-		 */
-		unsigned int readTimeout;
-
-		/*
-		 * Card protocol
-		 */
-		int cardProtocol;
-
-		/*
-		 * bInterfaceProtocol (CCID, ICCD-A, ICCD-B)
-		 */
-		int bInterfaceProtocol;
-
-
-		/*
-		 * GemCore SIM PRO slot status management
-		 * The reader always reports a card present even if no card is inserted.
-		 * If the Power Up fails the driver will report IFD_ICC_NOT_PRESENT instead
-		 * of IFD_ICC_PRESENT
-		 */
-		int dwSlotStatus;
-
-		/*
-		 * bVoltageSupport (bit field)
-		 * 1 = 5.0V
-		 * 2 = 3.0V
-		 * 4 = 1.8V
-		 */
-		int bVoltageSupport;
+	/*
+	 * bInterfaceProtocol (CCID, ICCD-A, ICCD-B)
+	 */
+	int bInterfaceProtocol;
 
 
-	} _ccid_descriptor;
+	/*
+	 * GemCore SIM PRO slot status management
+	 * The reader always reports a card present even if no card is inserted.
+	 * If the Power Up fails the driver will report IFD_ICC_NOT_PRESENT instead
+	 * of IFD_ICC_PRESENT
+	 */
+	int dwSlotStatus;
+
+	/*
+	 * bVoltageSupport (bit field)
+	 * 1 = 5.0V
+	 * 2 = 3.0V
+	 * 4 = 1.8V
+	 */
+	int bVoltageSupport;
+
+	
+} _ccid_descriptor;
 
 
-	/* See CCID specs ch. 4.2.1 */
+/* See CCID specs ch. 4.2.1 */
 #define CCID_ICC_PRESENT_ACTIVE		0x00	/* 00 0000 00 */
 #define CCID_ICC_PRESENT_INACTIVE	0x01	/* 00 0000 01 */
 #define CCID_ICC_ABSENT				0x02	/* 00 0000 10 */
@@ -241,16 +243,16 @@ extern "C" {
 #define SIZE_GET_SLOT_STATUS	10
 
 
-	/* convert a 4 byte integer in USB format into an int */
+/* convert a 4 byte integer in USB format into an int */
 #define dw2i(a, x) (unsigned int)((((((a[x+3] << 8) + a[x+2]) << 8) + a[x+1]) << 8) + a[x])
 
 
 #define IFD_PARITY_ERROR 699
 /////////////////////////////////////////
 
-	/*
-	 * List of defines available to ifdhandler
-	 */
+/*
+ * List of defines available to ifdhandler
+ */
 #define	IFD_SUCCESS				0   /**< no error */
 #define IFD_NEGOTIATE_PTS1		1   /**< negotiate PTS1 */
 #define IFD_NEGOTIATE_PTS2		2   /**< negotiate PTS2 */
@@ -274,11 +276,11 @@ extern "C" {
 #define IFD_NOT_SUPPORTED			614 /**< request is not supported */
 #define IFD_ICC_PRESENT				615 /**< card is present */
 #define IFD_ICC_NOT_PRESENT			616 /**< card is absent */
-	/**
-	 * The \ref IFD_NO_SUCH_DEVICE error must be returned by the driver when
-	 * it detects the reader is no more present. This will tell pcscd to
-	 * remove the reader from the list of available readers.
-	 */
+/**
+ * The \ref IFD_NO_SUCH_DEVICE error must be returned by the driver when
+ * it detects the reader is no more present. This will tell pcscd to
+ * remove the reader from the list of available readers.
+ */
 #define IFD_NO_SUCH_DEVICE				617
 #define IFD_ERROR_INSUFFICIENT_BUFFER	618 /**< buffer is too small */
 
@@ -287,9 +289,9 @@ extern "C" {
 //////////////////////////////////////////////////////////////////////////
 //pps
 //
-	/*
-	* Exported constants definition
-	*/
+/*
+* Exported constants definition
+*/
 
 #define PPS_OK				0	/* Negotiation OK */
 #define PPS_ICC_ERROR		1	/* Comunication error */
@@ -303,17 +305,17 @@ extern "C" {
 
 //////////////////////////////////////////////////////////////////////////
 //atr
-//
+// 
 
 
 
-	/* Return values */
+/* Return values */
 #define ATR_OK			0	/* ATR could be parsed and data returned */
 #define ATR_NOT_FOUND	1	/* Data not present in ATR */
 #define ATR_MALFORMED	2	/* ATR could not be parsed */
 #define ATR_IO_ERROR	3	/* I/O stream error */
-
-	/* Paramenters */
+ 
+/* Paramenters */
 #define ATR_MAX_SIZE 				33	/* Maximum size of ATR byte array */
 #define ATR_MAX_HISTORICAL			15	/* Maximum number of historical bytes */
 #define ATR_MAX_PROTOCOLS			7	/* Maximun number of protocols */
@@ -343,14 +345,14 @@ extern "C" {
 
 #define DUKPT_ENC_OFF           0x00 //default
 #define DUKPT_ENC_ON            0x01
-
+    
 #define DUKPT_ENC_FUNC_3DES     0x00 //default
 #define DUKPT_ENC_FUNC_AES      0x01
-
+    
 #define DUKPT_ENC_TYPE_DIR      0x00 //default
 #define DUKPT_ENC_TYPE_UNDIR    0x01
-
-	/* Default values for paramenters */
+    
+/* Default values for paramenters */
 
 #define ATR_DEFAULT_D	1
 #define ATR_DEFAULT_N	0
@@ -358,67 +360,70 @@ extern "C" {
 #define ATR_DEFAULT_I	50
 #define ATR_DEFAULT_F	372
 
-	/*
-	 * Exported data types definition
-	 */
+/*
+ * Exported data types definition
+ */
 
-	typedef struct {
-		unsigned length;
-		BYTE TS;
-		BYTE T0;
-		struct {
-			BYTE value;
-			bool present;
-		}
-		ib[ATR_MAX_PROTOCOLS][ATR_MAX_IB], TCK;
-		unsigned pn;
-		BYTE hb[ATR_MAX_HISTORICAL];
-		unsigned hbn;
-	} ATR_t;
+typedef struct
+{
+  unsigned length;
+  BYTE TS;
+  BYTE T0;
+  struct
+  {
+    BYTE value;
+    bool present;
+  }
+  ib[ATR_MAX_PROTOCOLS][ATR_MAX_IB], TCK;
+  unsigned pn;
+  BYTE hb[ATR_MAX_HISTORICAL];
+  unsigned hbn;
+} ATR_t;
 
 //////////////////////////////////////////////////////////////////////////
-	typedef struct CCID_DESC {
-		/*
-		 * ATR
-		 */
-		int nATRLength;
-		UCHAR pcATRBuffer[MAX_ATR_SIZE];
+typedef struct CCID_DESC
+{
+	/*
+	 * ATR
+	 */
+	int nATRLength;
+	UCHAR pcATRBuffer[MAX_ATR_SIZE];
 
-		/*
-		 * Card state
-		 */
-		UCHAR bPowerFlags;
+	/*
+	 * Card state
+	 */
+	UCHAR bPowerFlags;
 
-		/*
-		 * T=1 Protocol context
-		 */
-		t1_state_t t1;
+	/*
+	 * T=1 Protocol context
+	 */
+	t1_state_t t1;
 
-		/* reader name passed to IFDHCreateChannelByName() */
-		// char *readerName;
-	} CcidDesc;
+	/* reader name passed to IFDHCreateChannelByName() */
+	// char *readerName;
+} CcidDesc;
 
-	/* Powerflag (used to detect quick insertion removals unnoticed by the
-	 * resource manager) */
-	/* Initial value */
+/* Powerflag (used to detect quick insertion removals unnoticed by the
+ * resource manager) */
+/* Initial value */
 #define POWERFLAGS_RAZ 			0x00
-	/* Flag set when a power up has been requested */
+/* Flag set when a power up has been requested */
 #define MASK_POWERFLAGS_PUP		0x01
-	/* Flag set when a power down is requested */
+/* Flag set when a power down is requested */
 #define MASK_POWERFLAGS_PDWN	0x02
-
-	/*
-	 * Possible values :
-	 * 3 -> 1.8V, 3V, 5V
-	 * 2 -> 3V, 5V
-	 * 1 -> 5V only
-	 * 0 -> automatic (selection made by the reader)
-	 */
-	/*
-	 * To be safe we default to 5V
-	 * otherwise we would have to parse the ATR and get the value of TAi (i>2) when
-	 * in T=15
-	 */
+    
+/*
+ * Possible values :
+ * 3 -> 1.8V, 3V, 5V
+ * 2 -> 3V, 5V
+ * 1 -> 5V only
+ * 0 -> automatic (selection made by the reader)
+ */
+/*
+ * To be safe we default to 5V
+ * otherwise we would have to parse the ATR and get the value of TAi (i>2) when
+ * in T=15
+ */
 
 #define VOLTAGE_AUTO	0
 #define VOLTAGE_5V 		1
@@ -427,86 +432,86 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////////
 
-	extern RESPONSECODE CCID_Transmit(unsigned int reader_index, unsigned int tx_length,
-	                                  const unsigned char tx_buffer[], unsigned short rx_length, unsigned char bBWI);
-	extern RESPONSECODE CCID_Receive(unsigned int reader_index, unsigned int *rx_length,
-	                                 unsigned char rx_buffer[], unsigned char *chain_parameter);
-	extern int isCharLevel(int reader_index);
+extern RESPONSECODE CCID_Transmit(unsigned int reader_index, unsigned int tx_length,
+                           const unsigned char tx_buffer[], unsigned short rx_length, unsigned char bBWI);
+extern RESPONSECODE CCID_Receive(unsigned int reader_index, unsigned int *rx_length,
+                                 unsigned char rx_buffer[], unsigned char *chain_parameter);
+extern int isCharLevel(int reader_index);
 
-	extern RESPONSECODE CmdPowerOn(unsigned int reader_index, unsigned int * nlength,
-	                               unsigned char buffer[], int voltage);
+extern RESPONSECODE CmdPowerOn(unsigned int reader_index, unsigned int * nlength,
+                        unsigned char buffer[], int voltage);
 
-	extern RESPONSECODE CmdPowerOff(unsigned int reader_index);
+extern RESPONSECODE CmdPowerOff(unsigned int reader_index);  
+    
+extern RESPONSECODE SetParameters(unsigned int reader_index, char protocol,
+                                      unsigned int length, unsigned char buffer[]);
+extern _ccid_descriptor *get_ccid_descriptor(unsigned int reader_index);
 
-	extern RESPONSECODE SetParameters(unsigned int reader_index, char protocol,
-	                                  unsigned int length, unsigned char buffer[]);
-	extern _ccid_descriptor *get_ccid_descriptor(unsigned int reader_index);
+extern CcidDesc *get_ccid_slot(unsigned int reader_index);
 
-	extern CcidDesc *get_ccid_slot(unsigned int reader_index);
+extern RESPONSECODE CmdXfrBlock(unsigned int reader_index, unsigned int tx_length,
+                             unsigned char tx_buffer[], unsigned int *rx_length,
+                             unsigned char rx_buffer[], int protocol);
+    
+extern int ATR_InitFromArray (ATR_t * atr, const BYTE atr_buffer[ATR_MAX_SIZE], unsigned length);
+    
+extern int ATR_GetIntegerValue (ATR_t * atr, int name, BYTE * value);
+    
+extern int ATR_GetDefaultProtocol(ATR_t * atr, int *protocol);
+    
+extern int ATR_GetConvention (ATR_t * atr, int *convention);
+    
+extern int ATR_GetParameter (ATR_t * atr, int name, double *parameter);
+    
+extern RESPONSECODE  Scrd_Negotiate(unsigned int reader_index);
+   
+extern RESPONSECODE CmdGetSlotStatus(unsigned int reader_index, unsigned char buffer[]);  
+    
+extern int isbadreadptr(void *ptr, int length);
 
-	extern RESPONSECODE CmdXfrBlock(unsigned int reader_index, unsigned int tx_length,
-	                                unsigned char tx_buffer[], unsigned int *rx_length,
-	                                unsigned char rx_buffer[], int protocol);
+extern RESPONSECODE CmdGetSerialNum(unsigned int reader_index, unsigned int * pnlength,
+                                        unsigned char buffer[]);
+extern RESPONSECODE CmdWriteFlash(unsigned int reader_index,unsigned char bOffset, unsigned char blength,
+                                      unsigned char buffer[]);
+extern RESPONSECODE CmdReadFlash(unsigned int reader_index, unsigned char bOffset, unsigned char blength,
+                                     unsigned char buffer[]);
+extern RESPONSECODE CmdGetDevInfo(unsigned int reader_index, unsigned int * pnlength,
+                               unsigned char buffer[]);
+extern RESPONSECODE CmdGetDevVer(unsigned int reader_index,char *firmwareRevision,char *hardwareRevision);
+    
+extern  RESPONSECODE CmdWriteIKSN2IPEKFlash(unsigned int reader_index,unsigned char *encBuf,unsigned int nLen);
 
-	extern int ATR_InitFromArray (ATR_t * atr, const BYTE atr_buffer[ATR_MAX_SIZE], unsigned length);
+extern  RESPONSECODE CmdSetEncMod(unsigned int reader_index,unsigned int bEncrypt,unsigned int bEncFunc,
+                                        unsigned int bEncType);    
 
-	extern int ATR_GetIntegerValue (ATR_t * atr, int name, BYTE * value);
+extern  RESPONSECODE CmdGetKSN(unsigned int reader_index, unsigned int * pnlength,
+                           unsigned char buffer[]);
 
-	extern int ATR_GetDefaultProtocol(ATR_t * atr, int *protocol);
-
-	extern int ATR_GetConvention (ATR_t * atr, int *convention);
-
-	extern int ATR_GetParameter (ATR_t * atr, int name, double *parameter);
-
-	extern RESPONSECODE  Scrd_Negotiate(unsigned int reader_index);
-
-	extern RESPONSECODE CmdGetSlotStatus(unsigned int reader_index, unsigned char buffer[]);
-
-	extern int isbadreadptr(void *ptr, int length);
-
-	extern RESPONSECODE CmdGetSerialNum(unsigned int reader_index, unsigned int * pnlength,
-	                                    unsigned char buffer[]);
-	extern RESPONSECODE CmdWriteFlash(unsigned int reader_index,unsigned char bOffset, unsigned char blength,
-	                                  unsigned char buffer[]);
-	extern RESPONSECODE CmdReadFlash(unsigned int reader_index, unsigned char bOffset, unsigned char blength,
-	                                 unsigned char buffer[]);
-	extern RESPONSECODE CmdGetDevInfo(unsigned int reader_index, unsigned int * pnlength,
-	                                  unsigned char buffer[]);
-	extern RESPONSECODE CmdGetDevVer(unsigned int reader_index,char *firmwareRevision,char *hardwareRevision);
-
-	extern  RESPONSECODE CmdWriteIKSN2IPEKFlash(unsigned int reader_index,unsigned char *encBuf,unsigned int nLen);
-
-	extern  RESPONSECODE CmdSetEncMod(unsigned int reader_index,unsigned int bEncrypt,unsigned int bEncFunc,
-	                                  unsigned int bEncType);
-
-	extern  RESPONSECODE CmdGetKSN(unsigned int reader_index, unsigned int * pnlength,
-	                               unsigned char buffer[]);
-
-	extern  RESPONSECODE CmdEscape(unsigned int reader_index,
-	                               const unsigned char TxBuffer[], unsigned int TxLength,
-	                               unsigned char RxBuffer[], unsigned int *RxLength);
+extern  RESPONSECODE CmdEscape(unsigned int reader_index,
+                          const unsigned char TxBuffer[], unsigned int TxLength,
+                          unsigned char RxBuffer[], unsigned int *RxLength);
 ////////////////////////////////////////////////////////////////////////////
-	extern bool gIsOpen;
-	extern unsigned int gDevType;
-	extern unsigned int gIsReadData ;
-	extern unsigned int iR301_or_bR301;
-	extern unsigned int isDukpt;
-	extern void log_msg( const char *fmt, ...);
-	extern void Dpt( const char *fmt, ...);
-	extern void ccid_error(int error, const char *file, int line, const char *function);
-
-
+extern bool gIsOpen;
+extern unsigned int gDevType;
+extern unsigned int gIsReadData ;
+extern unsigned int iR301_or_bR301;
+extern unsigned int isDukpt;
+extern void log_msg( const char *fmt, ...);
+extern void Dpt( const char *fmt, ...);
+extern void ccid_error(int error, const char *file, int line, const char *function);
+    
+   
 #ifdef __APPLE__
 #pragma pack(1)
 #endif
-
-	/* restore default structure elements alignment */
+    
+/* restore default structure elements alignment */
 #ifdef __APPLE__
 #pragma pack()
 #endif
 
 #ifdef __cplusplus
-}
+    }
 #endif
 
-#endif //__HZ_CCID_H__
+#endif //__H

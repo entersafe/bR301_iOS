@@ -30,53 +30,60 @@
 @implementation ReaderInterface
 
 
-- (id)init {
-	self = [super init];
-	if (self) {
-	}
-
-	return self;
+- (id)init
+{
+    self = [super init];
+    if (self) {
+    }
+    
+    return self;
 }
 
--(BOOL) isReaderAttached {
-	return gIsOpen;
+-(BOOL) isReaderAttached
+{
+    return gIsOpen;
 }
 
-- (BOOL)isCardAttached {
-
-	LONG rv;
-
+- (BOOL)isCardAttached
+{
+    
+    LONG rv;
+	
 	int readerCount=0;
 	SCARD_READERSTATE rgReaderStates[1];
-
-	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
-
-	SCARDCONTEXT ContxtHandle;
-
-	ContxtHandle = (SCARDCONTEXT)ccid_descriptor;
-
-	rv = SCardGetStatusChange(ContxtHandle, INFINITE, rgReaderStates, readerCount);
-	if(rv!=SCARD_S_SUCCESS) {
-		return NO;
-	} else
-	{
-		if(rgReaderStates[0].dwEventState & SCARD_STATE_EMPTY) {
-			return NO;
-		} else
-		{
-			return YES;
-		}
+  
+    _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
+    
+    SCARDCONTEXT ContxtHandle;
+    
+    ContxtHandle = (SCARDCONTEXT)ccid_descriptor;
+        
+    rv = SCardGetStatusChange(ContxtHandle, INFINITE, rgReaderStates, readerCount);
+    if(rv!=SCARD_S_SUCCESS)
+    {
+        return NO;
+    }
+    else
+    {
+        if(rgReaderStates[0].dwEventState & SCARD_STATE_EMPTY)
+        {
+                return NO;
+        }
+        else
+        {
+                return YES;
+        }
 	}
 
-	return NO;
+    return NO;
 }
 
-- (void)  setDelegate:
-(id<ReaderInterfaceDelegate>)delegate {
-	bR301SessionController *sessionController = [bR301SessionController sharedController];
-
-[sessionController setDelegate:delegate];
-
+- (void)  setDelegate:(id<ReaderInterfaceDelegate>)delegate
+{
+    bR301SessionController *sessionController = [bR301SessionController sharedController];
+    
+    [sessionController setDelegate:delegate];
+    
 }
 @end
 

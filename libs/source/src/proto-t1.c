@@ -161,8 +161,8 @@ int t1_set_param(t1_state_t * t1, int type, long value)
  * Send an APDU through T=1
  */
 int t1_transceive(t1_state_t * t1, unsigned int dad,
-                  const void *snd_buf, size_t snd_len,
-                  void *rcv_buf, size_t rcv_len)
+		const void *snd_buf, size_t snd_len,
+		void *rcv_buf, size_t rcv_len)
 {
 	ct_buf_t sbuf, rbuf, tbuf;
 	unsigned char sdata[T1_BUFFER_SIZE], sblk[5];
@@ -173,7 +173,8 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 		return -1;
 
 	/* we can't talk to a dead card / reader. Reset it! */
-	if (t1->state == DEAD) {
+	if (t1->state == DEAD)
+	{
 		//DEBUG_CRITICAL("T=1 state machine is DEAD. Reset the card first.");
 		return -1;
 	}
@@ -196,22 +197,24 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 		retries--;
 
 		n = t1_xcv(t1, sdata, slen, sizeof(sdata));
-		if (-2 == n) {
-			//	DEBUG_COMM("Parity error");
+		if (-2 == n)
+		{
+		//	DEBUG_COMM("Parity error");
 			/* ISO 7816-3 Rule 7.4.2 */
 			if (retries == 0)
 				goto resync;
 
 			/* ISO 7816-3 Rule 7.2 */
-			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB])) {
+			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB]))
+			{
 //				DEBUG_COMM("Rule 7.2");
 				slen = t1_rebuild(t1, sdata);
 				continue;
 			}
 
 			slen = t1_build(t1, sdata,
-			                dad, T1_R_BLOCK | T1_EDC_ERROR,
-			                NULL, NULL);
+					dad, T1_R_BLOCK | T1_EDC_ERROR,
+					NULL, NULL);
 			continue;
 		}
 
@@ -222,22 +225,24 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 		}
 
 		if ((sdata[NAD] != swap_nibbles(dad)) /* wrong NAD */
-		    || (sdata[LEN] == 0xFF)) {	/* length == 0xFF (illegal) */
+			|| (sdata[LEN] == 0xFF))	/* length == 0xFF (illegal) */
+		{
 //			DEBUG_COMM("R-BLOCK required");
 			/* ISO 7816-3 Rule 7.4.2 */
 			if (retries == 0)
 				goto resync;
 
 			/* ISO 7816-3 Rule 7.2 */
-			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB])) {
+			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB]))
+			{
 //				DEBUG_COMM("Rule 7.2");
 				slen = t1_rebuild(t1, sdata);
 				continue;
 			}
 
 			slen = t1_build(t1, sdata,
-			                dad, T1_R_BLOCK | T1_OTHER_ERROR,
-			                NULL, NULL);
+				dad, T1_R_BLOCK | T1_OTHER_ERROR,
+				NULL, NULL);
 			continue;
 		}
 
@@ -248,15 +253,16 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				goto resync;
 
 			/* ISO 7816-3 Rule 7.2 */
-			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB])) {
+			if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB]))
+			{
 //				DEBUG_COMM("Rule 7.2");
 				slen = t1_rebuild(t1, sdata);
 				continue;
 			}
 
 			slen = t1_build(t1, sdata,
-			                dad, T1_R_BLOCK | T1_EDC_ERROR,
-			                NULL, NULL);
+				dad, T1_R_BLOCK | T1_EDC_ERROR,
+				NULL, NULL);
 			continue;
 		}
 
@@ -264,34 +270,38 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 		switch (t1_block_type(pcb)) {
 		case T1_R_BLOCK:
 			if ((sdata[LEN] != 0x00)	/* length != 0x00 (illegal) */
-			    || (pcb & 0x20)			/* b6 of pcb is set */
-			   ) {
+				|| (pcb & 0x20)			/* b6 of pcb is set */
+			   )
+			{
 //				DEBUG_COMM("R-Block required");
 				/* ISO 7816-3 Rule 7.4.2 */
 				if (retries == 0)
 					goto resync;
 
 				/* ISO 7816-3 Rule 7.2 */
-				if (T1_R_BLOCK == t1_block_type(t1->previous_block[1])) {
+				if (T1_R_BLOCK == t1_block_type(t1->previous_block[1]))
+				{
 //					DEBUG_COMM("Rule 7.2");
 					slen = t1_rebuild(t1, sdata);
 					continue;
 				}
 
 				slen = t1_build(t1, sdata,
-				                dad, T1_R_BLOCK | T1_OTHER_ERROR,
-				                NULL, NULL);
+						dad, T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 				continue;
 			}
 
 			if (((t1_seq(pcb) != t1->ns)	/* wrong sequence number & no bit more */
-			     && ! t1->more)
-			   ) {
+					&& ! t1->more)
+			   )
+			{
 //				DEBUG_COMM4("received: %d, expected: %d, more: %d",
 //					t1_seq(pcb), t1->ns, t1->more);
 
 				/* ISO 7816-3 Rule 7.2 */
-				if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB])) {
+				if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB]))
+				{
 //					DEBUG_COMM("Rule 7.2");
 					slen = t1_rebuild(t1, sdata);
 					continue;
@@ -302,14 +312,15 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				if (retries == 0)
 					goto resync;
 				slen = t1_build(t1, sdata,
-				                dad, T1_R_BLOCK | T1_OTHER_ERROR,
-				                NULL, NULL);
+						dad, T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 				continue;
 			}
 
 			if (t1->state == RECEIVING) {
 				/* ISO 7816-3 Rule 7.2 */
-				if (T1_R_BLOCK == t1_block_type(t1->previous_block[1])) {
+				if (T1_R_BLOCK == t1_block_type(t1->previous_block[1]))
+				{
 //					DEBUG_COMM("Rule 7.2");
 					slen = t1_rebuild(t1, sdata);
 					continue;
@@ -317,8 +328,8 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 
 //				DEBUG_COMM("");
 				slen = t1_build(t1, sdata,
-				                dad, T1_R_BLOCK,
-				                NULL, NULL);
+						dad, T1_R_BLOCK,
+						NULL, NULL);
 				break;
 			}
 
@@ -338,7 +349,7 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				goto resync;
 
 			slen = t1_build(t1, sdata, dad, T1_I_BLOCK,
-			                &sbuf, &last_send);
+					&sbuf, &last_send);
 			break;
 
 		case T1_I_BLOCK:
@@ -359,14 +370,15 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 			if (t1_seq(pcb) != t1->nr) {
 //				DEBUG_COMM("wrong nr");
 				slen = t1_build(t1, sdata, dad,
-				                T1_R_BLOCK | T1_OTHER_ERROR,
-				                NULL, NULL);
+						T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 				continue;
 			}
 
 			t1->nr ^= 1;
 
-			if (ct_buf_put(&rbuf, sdata + 3, sdata[LEN]) < 0) {
+			if (ct_buf_put(&rbuf, sdata + 3, sdata[LEN]) < 0)
+			{
 //				DEBUG_CRITICAL2("buffer overrun by %d bytes", sdata[LEN] - (rbuf.size - rbuf.tail));
 				goto error;
 			}
@@ -389,17 +401,19 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				retries = t1->retries;
 				ct_buf_init(&rbuf, rcv_buf, (unsigned int)rcv_len);
 				slen = t1_build(t1, sdata, dad, T1_I_BLOCK,
-				                &sbuf, &last_send);
+						&sbuf, &last_send);
 				continue;
 			}
 
-			if (T1_S_IS_RESPONSE(pcb)) {
+			if (T1_S_IS_RESPONSE(pcb))
+			{
 				/* ISO 7816-3 Rule 7.4.2 */
 				if (retries == 0)
 					goto resync;
 
 				/* ISO 7816-3 Rule 7.2 */
-				if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB])) {
+				if (T1_R_BLOCK == t1_block_type(t1->previous_block[PCB]))
+				{
 //					DEBUG_COMM("Rule 7.2");
 					slen = t1_rebuild(t1, sdata);
 					continue;
@@ -407,8 +421,8 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 
 //				DEBUG_CRITICAL("wrong response S-BLOCK received");
 				slen = t1_build(t1, sdata,
-				                dad, T1_R_BLOCK | T1_OTHER_ERROR,
-				                NULL, NULL);
+						dad, T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 				continue;
 			}
 
@@ -417,11 +431,12 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 //			DEBUG_COMM("S-Block request received");
 			switch (T1_S_TYPE(pcb)) {
 			case T1_S_RESYNC:
-				if (sdata[LEN] != 0) {
+				if (sdata[LEN] != 0)
+				{
 //					DEBUG_COMM2("Wrong length: %d", sdata[LEN]);
 					slen = t1_build(t1, sdata, dad,
-					                T1_R_BLOCK | T1_OTHER_ERROR,
-					                NULL, NULL);
+						T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 					continue;
 				}
 
@@ -430,11 +445,12 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				goto resync;
 
 			case T1_S_ABORT:
-				if (sdata[LEN] != 0) {
+				if (sdata[LEN] != 0)
+				{
 //					DEBUG_COMM2("Wrong length: %d", sdata[LEN]);
 					slen = t1_build(t1, sdata, dad,
-					                T1_R_BLOCK | T1_OTHER_ERROR,
-					                NULL, NULL);
+						T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 					continue;
 				}
 
@@ -443,11 +459,12 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				break;
 
 			case T1_S_IFS:
-				if (sdata[LEN] != 1) {
+				if (sdata[LEN] != 1)
+				{
 //					DEBUG_COMM2("Wrong length: %d", sdata[LEN]);
 					slen = t1_build(t1, sdata, dad,
-					                T1_R_BLOCK | T1_OTHER_ERROR,
-					                NULL, NULL);
+						T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 					continue;
 				}
 
@@ -459,11 +476,12 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 				break;
 
 			case T1_S_WTX:
-				if (sdata[LEN] != 1) {
+				if (sdata[LEN] != 1)
+				{
 //					DEBUG_COMM2("Wrong length: %d", sdata[LEN]);
 					slen = t1_build(t1, sdata, dad,
-					                T1_R_BLOCK | T1_OTHER_ERROR,
-					                NULL, NULL);
+						T1_R_BLOCK | T1_OTHER_ERROR,
+						NULL, NULL);
 					continue;
 				}
 
@@ -478,8 +496,8 @@ int t1_transceive(t1_state_t * t1, unsigned int dad,
 			}
 
 			slen = t1_build(t1, sdata, dad,
-			                T1_S_BLOCK | T1_S_RESPONSE | T1_S_TYPE(pcb),
-			                &tbuf, NULL);
+				T1_S_BLOCK | T1_S_RESPONSE | T1_S_TYPE(pcb),
+				&tbuf, NULL);
 		}
 
 		/* Everything went just splendid */
@@ -497,7 +515,7 @@ resync:
 		t1->ns = 0;
 		t1->nr = 0;
 		slen = t1_build(t1, sdata, dad, T1_S_BLOCK | T1_S_RESYNC, NULL,
-		                NULL);
+				NULL);
 		t1->state = RESYNCH;
 		t1->more = FALSE;
 		retries = 1;
@@ -537,8 +555,8 @@ static unsigned int t1_seq(unsigned char pcb)
 }
 
 unsigned int t1_build(t1_state_t * t1, unsigned char *block,
-                      unsigned char dad, unsigned char pcb,
-                      ct_buf_t *bp, size_t *lenp)
+	unsigned char dad, unsigned char pcb,
+	ct_buf_t *bp, size_t *lenp)
 {
 	unsigned int len;
 	char more = FALSE;
@@ -588,7 +606,8 @@ t1_rebuild(t1_state_t *t1, unsigned char *block)
 	/* copy the last sent block */
 	if (T1_R_BLOCK == t1_block_type(pcb))
 		memcpy(block, t1 -> previous_block, 4);
-	else {
+	else
+	{
 		return 0;
 	}
 
@@ -599,13 +618,13 @@ t1_rebuild(t1_state_t *t1, unsigned char *block)
  * Build/verify checksum
  */
 static unsigned int t1_compute_checksum(t1_state_t * t1,
-                                        unsigned char *data, size_t len)
+	unsigned char *data, size_t len)
 {
 	return (unsigned int)(len + t1->checksum(data, len, data + len));
 }
 
 static int t1_verify_checksum(t1_state_t * t1, unsigned char *rbuf,
-                              size_t len)
+	size_t len)
 {
 	unsigned char csum[2];
 	unsigned long m, n = 0;
@@ -627,7 +646,7 @@ static int t1_verify_checksum(t1_state_t * t1, unsigned char *rbuf,
  * Send/receive block
  */
 static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
-                  size_t rmax)
+	size_t rmax)
 {
 	unsigned int n;
 	_ccid_descriptor *ccid_desc ;
@@ -639,14 +658,16 @@ static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 	ccid_desc = get_ccid_descriptor(t1->lun);
 	oldReadTimeout = ccid_desc->readTimeout;
 
-	if (t1->wtx > 1) {
+	if (t1->wtx > 1)
+	{
 		/* set the new temporary timeout at WTX card request */
 		ccid_desc->readTimeout *=  t1->wtx;
 //		DEBUG_INFO2("New timeout at WTX request: %d sec",
 //			ccid_desc->readTimeout);
 	}
 
-	if (isCharLevel(t1->lun)) {
+	if (isCharLevel(t1->lun))
+	{
 		rmax = 3;
 
 		n = (unsigned int)CCID_Transmit(t1 -> lun, (unsigned int)slen, block, rmax, t1->wtx);
@@ -679,7 +700,9 @@ static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 			return -1;
 
 		n = (unsigned int)rmax + 3;
-	} else {
+	}
+	else
+	{
 		n = (unsigned int)CCID_Transmit(t1 -> lun, (unsigned int)slen, block, 0, t1->wtx);
 		t1->wtx = 0;	/* reset to default value */
 		if (n != IFD_SUCCESS)
@@ -705,7 +728,7 @@ static int t1_xcv(t1_state_t * t1, unsigned char *block, size_t slen,
 //	}
 
 	//if (n >= 0)
-	;//		DEBUG_XXD("received: ", block, n);
+        ;//		DEBUG_XXD("received: ", block, n);
 
 	/* Restore initial timeout */
 	ccid_desc->readTimeout = oldReadTimeout;
@@ -732,7 +755,8 @@ int t1_negotiate_ifsd(t1_state_t * t1, unsigned int dad, int ifsd)
 	/* Initialize send/recv buffer */
 	ct_buf_set(&sbuf, (void *)snd_buf, (unsigned int)snd_len);
 
-	while (TRUE) {
+	while (TRUE)
+	{
 		/* Build the block */
 		slen = t1_build(t1, sdata, 0, T1_S_BLOCK | T1_S_IFS, &sbuf, NULL);
 
@@ -744,18 +768,19 @@ int t1_negotiate_ifsd(t1_state_t * t1, unsigned int dad, int ifsd)
 		if (retries == 0)
 			goto error;
 
-		if (-1 == n) {
+		if (-1 == n)
+		{
 //			DEBUG_CRITICAL("fatal: transmit/receive failed");
 			goto error;
 		}
 
 		if ((-2 == n)								/* Parity error */
-		    || (sdata[DATA] != ifsd)				/* Wrong ifsd received */
-		    || (sdata[NAD] != swap_nibbles(dad))	/* wrong NAD */
-		    || (!t1_verify_checksum(t1, sdata, n))	/* checksum failed */
-		    || (n != 4 + (int)t1->rc_bytes)				/* wrong frame length */
-		    || (sdata[LEN] != 1)					/* wrong data length */
-		    || (sdata[PCB] != (T1_S_BLOCK | T1_S_RESPONSE | T1_S_IFS))) /* wrong PCB */
+			|| (sdata[DATA] != ifsd)				/* Wrong ifsd received */
+			|| (sdata[NAD] != swap_nibbles(dad))	/* wrong NAD */
+			|| (!t1_verify_checksum(t1, sdata, n))	/* checksum failed */
+			|| (n != 4 + (int)t1->rc_bytes)				/* wrong frame length */
+			|| (sdata[LEN] != 1)					/* wrong data length */
+			|| (sdata[PCB] != (T1_S_BLOCK | T1_S_RESPONSE | T1_S_IFS))) /* wrong PCB */
 			continue;
 
 		/* no more error */
