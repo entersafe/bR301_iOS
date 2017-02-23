@@ -36,7 +36,7 @@
 
 #import "bR301SessionController.h"
 
-#define FT_IR301_DEBUG
+//#define FT_IR301_DEBUG
 
 static _ccid_descriptor s_ccidDevice[CCID_DRIVER_MAX_READERS]={0};
 
@@ -63,10 +63,10 @@ static void i2dw(int value, unsigned char buffer[])
 *
 ****************************************************************************/
 
-static unsigned int bei2i(unsigned char buffer[])
-{
-	return (buffer[0]<<24) + (buffer[1]<<16) + (buffer[2]<<8) + buffer[3];
-}
+//static unsigned int bei2i(unsigned char buffer[])
+//{
+//	return (buffer[0]<<24) + (buffer[1]<<16) + (buffer[2]<<8) + buffer[3];
+//}
 
 /*****************************************************************************
  *
@@ -132,7 +132,7 @@ status_t ReadSerial(unsigned int reader_index,
         if(iRet != 0)
         {
 #ifdef FT_IR301_DEBUG
-            //NSLog(@"==========read error\n");
+            NSLog(@"==========read error iRet=%d\n", iRet);
 #endif
             return STATUS_COMM_ERROR;
         }
@@ -153,7 +153,7 @@ status_t ReadSerial(unsigned int reader_index,
         }
     }
     @catch (...) {
-        
+        NSLog(@"==========read error STATUS_COMM_ERROR\n");
         return STATUS_COMM_ERROR;
     }
     @finally {

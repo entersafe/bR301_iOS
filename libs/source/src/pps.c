@@ -29,6 +29,13 @@
  * Not exported funtions declaration
  */
 
+static DWORD Fi[16] = {372,372,558,744,1116,1488,1860,0,0,512,768,1024,1536,2048,0,0};
+static BYTE Di[16] = {0,1,2,4,8,16,32,64,12,20,0,0,0,0,0,0};
+static DWORD B55_maxPPS = 318.279;/*KHZ*/ //TA1=0X16 Clock = 3.7MHZ
+//static DWORD C63_maxPPS = 344.086;/*KHZ*/ //TA1=0X16 Clock = 4MHZ
+static float B55_clock = 3700;/*KHZ*/
+//static float C63_clock = 4000;/*KHZ*/
+
 static bool PPS_Match (BYTE * request, unsigned len_request, BYTE * reply, unsigned len_reply);
 
 static unsigned PPS_GetLength (BYTE * block);
@@ -202,6 +209,33 @@ void extra_egt(ATR_t *atr, _ccid_descriptor *ccid_desc, DWORD Protocol)
 
 
 
+/**
+ *  Follow the standard of CCID add PPS feature, if the card speed faster than 96, then set to 96
+ *
+ *  @param ATR_t               atr
+ *  @param negotiationResult   pps
+ *
+ *  @return error
+ */
+RESPONSECODE ppsNegotiationValue(ATR_t *atr, BYTE *negotiationResult)
+{
+    BYTE F = 0, D = 0;
+    
+    ATR_GetIntegerValue (atr, ATR_INTEGER_VALUE_FI, &F);//Hight 4 bit
+    ATR_GetIntegerValue (atr, ATR_INTEGER_VALUE_DI, &D);//Low 4 bit
+	
+	if (Fi[F] == 0 || Di[D] == 0) {
+        return IFD_ERROR_NOT_SUPPORTED;
+    }
+    
+    DWORD speedValue = Di[D]*B55_clock/Fi[F];
+    if (speedValue >= B55_maxPPS) {
+        *negotiationResult = 0x96;
+    }else{
+        *negotiationResult = atr->ib[0][ATR_INTERFACE_BYTE_TA].value;
+    }
+    return IFD_SUCCESS;
+}
 /////////////
 RESPONSECODE  
 Scrd_Negotiate(unsigned int reader_index)
@@ -249,10 +283,6 @@ Scrd_Negotiate(unsigned int reader_index)
 		}
 	}
     ccid_descriptor->cardProtocol = protocol;
-    
-//    if( FT_READER_UA != gDevType){
-        return IFD_SUCCESS;
-//    }
     
 	/* TCi (i>2) indicates CRC instead of LRC */
 	if (T_1 == protocol)
@@ -327,7 +357,20 @@ Scrd_Negotiate(unsigned int reader_index)
 		//DbgPrint("######### Specific mode #########\n");
 
 		pps[1] |= 0x10; /* PTS1 presence */
-		pps[2] = atr.ib[0][ATR_INTERFACE_BYTE_TA].value;
+        BYTE NegotiationPps = 0x00;
+        RESPONSECODE returnValue = ppsNegotiationValue(&atr, &NegotiationPps);
+        if (returnValue != IFD_SUCCESS) {
+            return IFD_SUCCESS;
+        }
+        if (atr.ib[0][ATR_INTERFACE_BYTE_TA].value != NegotiationPps) {
+            pps[2] = NegotiationPps;
+        }else{
+        
+            pps[2] = atr.ib[0][ATR_INTERFACE_BYTE_TA].value;
+            if (gDevType != FT_READER_UA) {
+                return IFD_SUCCESS;
+            }
+        }
 	}
 
 	// set parameters for T=0 or T=1

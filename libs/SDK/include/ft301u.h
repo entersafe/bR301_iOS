@@ -193,6 +193,19 @@ extern "C"
      
      */
     void FtGetLibVersion (char *buffer);
+	
+	/*
+     Function: FtGetCurrentReaderType
+     
+     Parameters:
+     readerType : Get reader type
+     
+     
+     Description:
+     Get the Current reader type
+     
+     */
+	LONG FtGetCurrentReaderType(unsigned int *readerType);
     
 #ifdef __cplusplus
 }

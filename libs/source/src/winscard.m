@@ -4,7 +4,7 @@
  * Copyright (C) Feitian 2014, Ben <ben@ftsafe.com>
  *
  * This file has moved from PC/SC Lite APIs by GNU license (http://pcsclite.alioth.debian.org/pcsclite.html)
- * 
+ *
  * Based on PC/SC Lite API, Feitian have integrted own private command:
  * FtGetDevVer,FtGetSerialNum,FtWriteFlash,FtReadFlash,FtSetTimeout,FtDukptInit,FtDukptSetEncMod,FtDukptGetKSN,FtDidEnterBackground,FtSle4442Cmd,FtGetDevVer,FtGetLibVersion
  *
@@ -44,7 +44,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * $Id: winscard.c 6851 2014-02-14 15:43:32Z rousseau $
-
+ 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -88,6 +88,7 @@
 #include <string.h>
 #include "ft_ccid.h"
 #import "bR301SessionController.h"
+#import "ft301u.h"
 
 extern unsigned int g_dwTimeOut;
 extern unsigned int iR301_or_bR301;
@@ -96,91 +97,89 @@ extern pthread_mutex_t CommunicatonMutex;
 
 unsigned int isDukpt = 0;
 
-char Ft_iR301U_Version[3]={0x01,0x31,0x02};
+
+//1.31.3 - Solve the CPU usage issue
+//1.31.4 - Add get reader type API
+//1.31.5 - add auto pps
+//1.31.6 - add customer OEM reader support
+//1.31.7 - The version using by customer OEM
+//1.31.9 - Fix bug while in close session, the behave is using bluetooth printer with bR301 and iR301, the reader session will close.
+//1.32.0 - Fix block issue while in reading data from reader, the behave is random get 0x80100016 error, the error only happen with iR301 series
+char Ft_iR301U_Version[3]={0x01,0x32,0x00};
 volatile int eStablishContextCount = 0;
 volatile int eShCardHandleCount = 0;
 
 
-SCARD_IO_REQUEST g_rgSCardT0Pci={T_0,0}, g_rgSCardT1Pci={T_1,0},
-g_rgSCardRawPci={T_RAW,0};
+SCARD_IO_REQUEST g_rgSCardT0Pci= {T_0,0}, g_rgSCardT1Pci= {T_1,0},
+g_rgSCardRawPci= {T_RAW,0};
 
 
 
 #pragma mark PCSC APIs
 
-
 LONG SCardEstablishContext(DWORD dwScope, /*@unused@*/ LPCVOID pvReserved1,
                            /*@unused@*/ LPCVOID pvReserved2, LPSCARDCONTEXT phContext)
 {
-
-    if ( SCARD_SCOPE_SYSTEM != dwScope )
-    {
+    
+    if ( SCARD_SCOPE_SYSTEM != dwScope ) {
         return SCARD_E_INVALID_VALUE;
     }
     
-    if (NULL == phContext) 
-    {
+    if (NULL == phContext) {
         return SCARD_E_INVALID_PARAMETER ;
     }
-   
-   
-
+    
+    pthread_mutex_lock(&CommunicatonMutex);
+    
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     ccid_descriptor->dwMaxCCIDMessageLength = 272;
     ccid_descriptor->dwSlotStatus = IFD_ICC_NOT_PRESENT;
-    
-
-    pthread_mutex_lock(&CommunicatonMutex);
     eStablishContextCount = eStablishContextCount + 1;
-
+    
+    *phContext = (SCARDCONTEXT)ccid_descriptor;
+    
     [[bR301SessionController sharedController] RegisterAccessoryConnectNotification];
     pthread_mutex_unlock(&CommunicatonMutex);
-    *phContext = (SCARDCONTEXT)ccid_descriptor;
+    
     return SCARD_S_SUCCESS;
 }
 
 
 LONG SCardReleaseContext(SCARDCONTEXT hContext)
 {
-
-    if (0 == hContext)
-    {
+    
+    if (0 == hContext) {
         return SCARD_E_INVALID_HANDLE;
     }
     
     hContext =  0;
-   
+    
     pthread_mutex_lock(&CommunicatonMutex);
-    if (eStablishContextCount <= 0)
-    {
+    if (eStablishContextCount <= 0) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_S_SUCCESS;
     }
     eStablishContextCount = eStablishContextCount - 1;
-    if (eStablishContextCount <= 0)
-    {
+    if (eStablishContextCount <= 0) {
         [[bR301SessionController sharedController] UnRegisterAccessoryConnectNotification];
-      
     }
     pthread_mutex_unlock(&CommunicatonMutex);
-
-	return SCARD_S_SUCCESS;
+    
+    return SCARD_S_SUCCESS;
 }
 
 
 LONG SCardIsValidContext(SCARDCONTEXT hContext)
 {
-    if (0 == hContext) 
-    {
+    if (0 == hContext) {
         return SCARD_E_INVALID_HANDLE;
     }
     
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
-    if(isbadreadptr(ccid_descriptor,sizeof(_ccid_descriptor)))
-    {
+    if(isbadreadptr(ccid_descriptor,sizeof(_ccid_descriptor))) {
         return SCARD_E_INVALID_HANDLE;
     }
-   
+    
     return SCARD_S_SUCCESS;
 }
 
@@ -190,135 +189,118 @@ LONG SCardListReaders(SCARDCONTEXT hContext,
                       /*@out@*/ LPDWORD pcchReaders)
 {
     int namelen = strlen("FT smartcard reader")+2;
-  
-    if (0 == hContext) 
-    {
+    
+    if (0 == hContext) {
         return SCARD_E_INVALID_HANDLE;
     }
-
-    if (pcchReaders == NULL){
-       
-		return SCARD_E_INVALID_PARAMETER;
+    
+    if (pcchReaders == NULL) {
+        
+        return SCARD_E_INVALID_PARAMETER;
     }
     pthread_mutex_lock(&CommunicatonMutex);
     bR301SessionController *sessionController = [bR301SessionController sharedController];
+    
     pthread_mutex_unlock(&CommunicatonMutex);
-    if(0 ==  [sessionController identifyAccessoryCount])
-    {
+    if(0 ==  [sessionController identifyAccessoryCount]) {
         return SCARD_E_READER_UNAVAILABLE;
     }
-
-    if (mszReaders != NULL)
-    {
-        if (*pcchReaders < namelen)
-        {
+    
+    if (mszReaders != NULL) {
+        if (*pcchReaders < namelen) {
             return SCARD_E_INSUFFICIENT_BUFFER ;
         }
         memcpy(mszReaders, "FT smartcard reader",namelen-1);
         mszReaders[namelen-1]=0;
     }
     *pcchReaders = namelen;
-
+    
     return SCARD_S_SUCCESS;
 }
 
 
 
 LONG SCardConnect( SCARDCONTEXT hContext, LPCSTR szReader,
-	DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
-	LPDWORD pdwActiveProtocol)
+                  DWORD dwShareMode, DWORD dwPreferredProtocols, LPSCARDHANDLE phCard,
+                  LPDWORD pdwActiveProtocol)
 {
-    unsigned char buf[256]={0};
+    unsigned char buf[256]= {0};
     unsigned int len1 =sizeof(buf);
     long ReturnValue = 0;
     
     //////////////////////////////////////////////////////
-    if ( NO == gIsOpen)
-    {
+    if ( NO == gIsOpen) {
         return SCARD_E_READER_UNAVAILABLE;
     }
     /////////////////////////////////////////////////////
     
-
-    if (0 ==  hContext)
-    {
+    if (0 ==  hContext) {
         return SCARD_E_INVALID_HANDLE;
     }
-    if (NULL ==  phCard) 
-    {
+    if (NULL ==  phCard) {
         return SCARD_E_INVALID_PARAMETER;
     }
-
-    if (pdwActiveProtocol == NULL)
-    {
-		return SCARD_E_INVALID_PARAMETER;
+    
+    if (pdwActiveProtocol == NULL) {
+        return SCARD_E_INVALID_PARAMETER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
     CcidDesc * CcidSlots = get_ccid_slot(0);
-    if ( NO == gIsOpen)
-    {
+    if ( NO == gIsOpen) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     
     ReturnValue = CmdPowerOff(0);
-    if (ReturnValue != IFD_SUCCESS)
-    {
+    if (ReturnValue != IFD_SUCCESS) {
         [NSThread sleepForTimeInterval:0.002];
     }
     
     ReturnValue =  CmdPowerOn(0,&len1,buf,VOLTAGE_AUTO);
-
-    if(IFD_SUCCESS != ReturnValue)
-    {
-        //add if poweron faile clear atr
+    
+    if(IFD_SUCCESS != ReturnValue) {
+        //add if power on failed then clear atr
         CcidSlots->nATRLength = 0;
         *CcidSlots->pcATRBuffer = '\0';
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_NOT_TRANSACTED;
         
-    }else{
+    } else {
         
-        if(len1 >= 1){
+        if(len1 >= 1) {
             CcidSlots->nATRLength = len1;
             memcpy(CcidSlots->pcATRBuffer,buf,len1);
             CcidSlots->bPowerFlags |= MASK_POWERFLAGS_PUP;
-        }else{
+        } else {
             
             pthread_mutex_unlock(&CommunicatonMutex);
             return SCARD_E_READER_UNSUPPORTED;
         }
     }
-
-
+    
     /* initialise T=1 context */
     (void)t1_init(&(CcidSlots->t1), 0);
     Scrd_Negotiate(0);
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     int CardProtocol = ccid_descriptor->cardProtocol;
-
-
-    if (CardProtocol == T_0)
-    {
+    
+    
+    if (CardProtocol == T_0) {
         *pdwActiveProtocol =  SCARD_PROTOCOL_T0;
-    }
-    else if(CardProtocol == T_1)
-    {
+    } else if(CardProtocol == T_1) {
         *pdwActiveProtocol =  SCARD_PROTOCOL_T1;
-    }
-    else
-    {
+    } else {
         *pdwActiveProtocol = SCARD_PROTOCOL_UNDEFINED;
-         pthread_mutex_unlock(&CommunicatonMutex);
+        pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_UNSUPPORTED_FEATURE;
     }
     
     *phCard = (SCARDHANDLE)CcidSlots;
     eShCardHandleCount = eShCardHandleCount + 1;
     pthread_mutex_unlock(&CommunicatonMutex);
-
-	return SCARD_S_SUCCESS;
+    
+    return SCARD_S_SUCCESS;
 }
 
 
@@ -337,15 +319,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
 {
     long ReturnValue = 0;
     
-    //////////////////////////////////////////////////////
-    if ( NO == gIsOpen)
-    {
+    if ( NO == gIsOpen) {
         return SCARD_E_READER_UNAVAILABLE;
     }
-    /////////////////////////////////////////////////////
-
-    if (0 ==  hCard) 
-    {
+    
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     
@@ -353,20 +331,17 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
     if ((dwDisposition != SCARD_LEAVE_CARD)
         && (dwDisposition != SCARD_UNPOWER_CARD)
         && (dwDisposition != SCARD_RESET_CARD)
-        && (dwDisposition != SCARD_EJECT_CARD))
-    {
+        && (dwDisposition != SCARD_EJECT_CARD)) {
         return SCARD_E_INVALID_VALUE;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
-    if (gIsOpen == NO)
-    {
+    if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     
-    if (eShCardHandleCount <= 0)
-    {
+    if (eShCardHandleCount <= 0) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_INVALID_TARGET;
     }
@@ -377,12 +352,11 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
         return SCARD_S_SUCCESS;
     }
     
-
-    eShCardHandleCount = eShCardHandleCount - 1;
-
     
-    if (eShCardHandleCount > 0)
-    {
+    eShCardHandleCount = eShCardHandleCount - 1;
+    
+    
+    if (eShCardHandleCount > 0) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_S_SUCCESS;
     }
@@ -397,8 +371,7 @@ LONG SCardDisconnect(SCARDHANDLE hCard, DWORD dwDisposition)
     isDukpt = 0;
     pthread_mutex_unlock(&CommunicatonMutex);
     
-    if (ReturnValue != IFD_SUCCESS )
-    {
+    if (ReturnValue != IFD_SUCCESS ) {
         return SCARD_F_COMM_ERROR;
     }
     
@@ -412,23 +385,19 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
 {
     
     unsigned char pcbuffer[SIZE_GET_SLOT_STATUS];
-    unsigned char ATRBuffer[33]={0};
+    unsigned char ATRBuffer[33]= {0};
     int ATRLength = 0;
     int CardProtocol = 0;
     int namelen = strlen("iRockey 301")+2;
     unsigned int oldReadTimeout;
     RESPONSECODE return_value = IFD_COMMUNICATION_ERROR;
     
-    if (pcchReaderLen != NULL )
-    {
-        if (mszReaderNames != NULL && *pcchReaderLen >= namelen)
-        {
+    if (pcchReaderLen != NULL ) {
+        if (mszReaderNames != NULL && *pcchReaderLen >= namelen) {
             strcpy(mszReaderNames, "iRockey 301");
             mszReaderNames[namelen -1]='\0';
             *pcchReaderLen = namelen;
-        }
-        else
-        {
+        } else {
             *pcchReaderLen = 0;
             
             return SCARD_E_INSUFFICIENT_BUFFER;
@@ -439,8 +408,7 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     CcidDesc *CcidSlots = get_ccid_slot(0);
     
-    if (gIsOpen == NO)
-    {
+    if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
@@ -449,12 +417,10 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
     /* use default timeout since the reader may not be present anymore */
     
     oldReadTimeout = g_dwTimeOut;
-    if (iR301_or_bR301 == 0)
-    {
+    if (iR301_or_bR301 == 0) {
         g_dwTimeOut= 600;
     }
-    if (iR301_or_bR301 == 1)
-    {
+    if (iR301_or_bR301 == 1) {
         g_dwTimeOut = 1500;
     }
     
@@ -463,16 +429,14 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
     /* set back the old timeout */
     g_dwTimeOut = oldReadTimeout;
     
-    if (return_value != IFD_SUCCESS)
-    {
+    if (return_value != IFD_SUCCESS) {
         return_value = SCARD_E_NOT_TRANSACTED;
         pthread_mutex_unlock(&CommunicatonMutex);
         return (int)return_value;
     }
     
     return_value = IFD_COMMUNICATION_ERROR;
-    switch (pcbuffer[STATUS_OFFSET] & CCID_ICC_STATUS_MASK)	/* bStatus */
-    {
+    switch (pcbuffer[STATUS_OFFSET] & CCID_ICC_STATUS_MASK) {	/* bStatus */
         case CCID_ICC_PRESENT_ACTIVE:
             return_value = SCARD_PRESENT;
             ccid_descriptor->dwSlotStatus = IFD_ICC_PRESENT;
@@ -501,13 +465,11 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
             break;
     }
     
-    if (pcbuffer[ERROR_OFFSET] == 0xFE)
-    {
+    if (pcbuffer[ERROR_OFFSET] == 0xFE) {
         return_value = SCARD_ABSENT;
     }
     
-    if (return_value == SCARD_PRESENT)
-    {
+    if (return_value == SCARD_PRESENT) {
         
         ATRLength = CcidSlots->nATRLength;
         memcpy(ATRBuffer, CcidSlots->pcATRBuffer, ATRLength);
@@ -515,23 +477,19 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
         
     }
     
-    if (pdwState != NULL)
-    {
+    if (pdwState != NULL) {
         *pdwState = (unsigned int)return_value;
     }
     
     
-    if (pcbAtrLen != NULL)
-    {
+    if (pcbAtrLen != NULL) {
         
-        if (*pcbAtrLen < ATRLength)
-        {
+        if (*pcbAtrLen < ATRLength) {
             *pcbAtrLen = 0;
             pthread_mutex_unlock(&CommunicatonMutex);
             return SCARD_E_INSUFFICIENT_BUFFER;
         }
-        if ( pbAtr !=  NULL)
-        {
+        if ( pbAtr !=  NULL) {
             
             memcpy(pbAtr,ATRBuffer ,ATRLength);
         }
@@ -540,16 +498,13 @@ LONG SCardStatus(SCARDHANDLE hCard, LPSTR mszReaderNames,
         
     }
     
-    if (pdwProtocol != NULL)
-    {
+    if (pdwProtocol != NULL) {
         
         if (CardProtocol == T_0) {
             *pdwProtocol =  SCARD_PROTOCOL_T0;
-        }
-        else if(CardProtocol == T_1){
+        } else if(CardProtocol == T_1) {
             *pdwProtocol =  SCARD_PROTOCOL_T1;
-        }
-        else {
+        } else {
             *pdwProtocol = SCARD_PROTOCOL_UNDEFINED;
         }
         
@@ -565,21 +520,18 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
                     LPBYTE pbAttr, LPDWORD pcbAttrLen)
 {
     int ATRLength = 0;
-    unsigned char ATRBuffer[33]={0};
+    unsigned char ATRBuffer[33]= {0};
     
-    if (0 ==  hCard)
-    {
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     
-    if (pcbAttrLen == NULL || pbAttr == NULL)
-    {
+    if (pcbAttrLen == NULL || pbAttr == NULL) {
         return SCARD_E_INVALID_PARAMETER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
-    if (gIsOpen == NO)
-    {
+    if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
@@ -591,18 +543,14 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
     }
     pthread_mutex_unlock(&CommunicatonMutex);
     
-    if(ATRLength > 0)
-    {
-        if (*pcbAttrLen < ATRLength )
-        {
+    if(ATRLength > 0) {
+        if (*pcbAttrLen < ATRLength ) {
             *pcbAttrLen = 0;
             return SCARD_E_INVALID_PARAMETER;
         }
         memcpy(pbAttr,ATRBuffer,ATRLength);
         *pcbAttrLen = ATRLength;
-    }
-    else
-    {
+    } else {
         return SCARD_E_INSUFFICIENT_BUFFER;
     }
     
@@ -612,8 +560,7 @@ LONG SCardGetAttrib(SCARDHANDLE hCard, DWORD dwAttrId,
 LONG SCardBeginTransaction(SCARDHANDLE hCard)
 {
     
-    if (0 ==  hCard)
-    {
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     
@@ -623,8 +570,7 @@ LONG SCardBeginTransaction(SCARDHANDLE hCard)
 LONG SCardEndTransaction(SCARDHANDLE hCard, DWORD dwDisposition)
 {
     
-    if (0 ==  hCard) 
-    {
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     if ((dwDisposition != SCARD_LEAVE_CARD)
@@ -654,40 +600,34 @@ LONG SCardControl(SCARDHANDLE hCard, DWORD dwControlCode,
     unsigned char buf[300];
     unsigned int  len =sizeof(buf);
     
-    if (0 ==  hCard)
-    {
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     
     if (pbSendBuffer == NULL || pbRecvBuffer == NULL || lpBytesReturned == NULL)
         return SCARD_E_INVALID_PARAMETER;
     
-    if (cbSendLength > 272 -10 )
-    {
+    if (cbSendLength > 272 -10 ) {
         return SCARD_E_INVALID_PARAMETER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
-    if (gIsOpen == NO)
-    {
+    if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     
-    if (dwControlCode == SCARD_CTL_CODE(3500))
-    {
+    if (dwControlCode == SCARD_CTL_CODE(3500)) {
         
         
         rv = CmdEscape(0, (unsigned char*)pbSendBuffer, cbSendLength, buf, &len);
         pthread_mutex_unlock(&CommunicatonMutex);
-        if( IFD_SUCCESS != rv)
-        {
+        if( IFD_SUCCESS != rv) {
             
             return SCARD_E_NOT_TRANSACTED;
         }
         
-        if (cbRecvLength < len)
-        {
+        if (cbRecvLength < len) {
             return SCARD_E_INSUFFICIENT_BUFFER;
         }
         *lpBytesReturned = len;
@@ -710,51 +650,40 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
     unsigned char buf[CMD_BUF_SIZE];
     unsigned int len =sizeof(buf);
     
-    //////////////////////////////////////////////////////
-    if ( NO == gIsOpen)
-    {
+    if ( NO == gIsOpen) {
         return SCARD_E_READER_UNAVAILABLE;
     }
-    /////////////////////////////////////////////////////
-
-
-    if (0 ==  hCard)
-    {
+    
+    
+    if (0 ==  hCard) {
         return SCARD_E_INVALID_HANDLE;
     }
     
-    if (NULL == pioSendPci)
-    {
+    if (NULL == pioSendPci) {
         return SCARD_E_INVALID_VALUE;
     }
     
-    if (pbSendBuffer == NULL || pbRecvBuffer == NULL || pcbRecvLength == NULL)
-    {
+    if (pbSendBuffer == NULL || pbRecvBuffer == NULL || pcbRecvLength == NULL) {
         return SCARD_E_INVALID_PARAMETER;
     }
     
     /*
      * Must at least have 2 status words even for SCardControl
      */
-    if (*pcbRecvLength < 2)
-    {
+    if (*pcbRecvLength < 2) {
         return SCARD_E_INSUFFICIENT_BUFFER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
-    if (gIsOpen == NO)
-    {
+    if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     _ccid_descriptor *ccid_descriptor = get_ccid_descriptor(0);
     len = CMD_BUF_SIZE;
-    if( FT_READER_UA != gDevType)
-    {
+    if( FT_READER_UA != gDevType) {
         rv = CmdXfrBlock(0, (unsigned int)cbSendLength,(unsigned char*)pbSendBuffer, &len, buf,T_0);
-    }
-    else
-    {
+    } else {
         rv = CmdXfrBlock(0, (unsigned int)cbSendLength,(unsigned char*)pbSendBuffer, &len, buf,ccid_descriptor->cardProtocol);
     }
     
@@ -773,14 +702,12 @@ LONG SCardTransmit(SCARDHANDLE hCard, const SCARD_IO_REQUEST *pioSendPci,
 #endif
     
     pthread_mutex_unlock(&CommunicatonMutex);
-    if( IFD_SUCCESS != rv)
-    {
+    if( IFD_SUCCESS != rv) {
         
         return SCARD_E_NOT_TRANSACTED;
     }
     
-    if (*pcbRecvLength < len)
-    {
+    if (*pcbRecvLength < len) {
         *pcbRecvLength = 0;
         return SCARD_E_INSUFFICIENT_BUFFER;
     }
@@ -798,28 +725,21 @@ LONG SCardGetStatusChange(SCARDCONTEXT hContext,
     LONG rv =0;
     DWORD dwState;
     
-    if (rgReaderStates == NULL && cReaders > 0)
-    {
+    if (rgReaderStates == NULL && cReaders > 0) {
         return  SCARD_E_INVALID_PARAMETER;
     }
     
     rv =  SCardStatus(NULL,NULL,NULL,&dwState,NULL,NULL,NULL);
     
-    if(SCARD_S_SUCCESS != rv)
-    {
+    if(SCARD_S_SUCCESS != rv) {
         rgReaderStates->dwEventState = SCARD_STATE_EMPTY;
         return rv;
-    }
-    else
-    {
-        if (SCARD_ABSENT == dwState)
-        {
+    } else {
+        if (SCARD_ABSENT == dwState) {
             eShCardHandleCount = 0;
             isDukpt = 0;
             rgReaderStates->dwEventState = SCARD_STATE_EMPTY;
-        }
-        else
-        {
+        } else {
             rgReaderStates->dwEventState = SCARD_STATE_PRESENT;
         }
     }
@@ -846,8 +766,6 @@ PCSC_API  LONG SCardSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
     return 0;
 }
 
-
-
 #pragma mark duktp
 LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRevision)
 {
@@ -855,18 +773,15 @@ LONG FtGetDevVer( SCARDCONTEXT hContext,char *firmwareRevision,char *hardwareRev
     
     pthread_mutex_lock(&CommunicatonMutex);
     bR301SessionController *sessionController = [bR301SessionController sharedController];
-    if (sessionController.identifyAccessoryCount == 0 ){
+    if (sessionController.identifyAccessoryCount == 0 ) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     rv = CmdGetDevVer(0,firmwareRevision,hardwareRevision);
     pthread_mutex_unlock(&CommunicatonMutex);
-    if (IFD_SUCCESS == rv)
-    {
+    if (IFD_SUCCESS == rv) {
         return SCARD_S_SUCCESS;
-    }
-    else
-    {
+    } else {
         return SCARD_E_NO_READERS_AVAILABLE;
     }
 }
@@ -875,12 +790,11 @@ LONG FtDukptInit(SCARDHANDLE hCard,unsigned char *encBuf,unsigned int nLen)
 {
     
     long rv=0;
-    if (nLen  != 40 && nLen  != 48)
-    {
+    if (nLen  != 40 && nLen  != 48) {
         return SCARD_E_INVALID_PARAMETER;
     }
     pthread_mutex_lock(&CommunicatonMutex);
-
+    
     if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
@@ -888,16 +802,13 @@ LONG FtDukptInit(SCARDHANDLE hCard,unsigned char *encBuf,unsigned int nLen)
     rv= CmdWriteIKSN2IPEKFlash( 0,encBuf,nLen);
     pthread_mutex_unlock(&CommunicatonMutex);
     
-    if (IFD_SUCCESS == rv) 
-    {
+    if (IFD_SUCCESS == rv) {
         return SCARD_S_SUCCESS;
-    }
-    else 
-    {
+    } else {
         return SCARD_F_COMM_ERROR;
     }
     return 0;
-
+    
 }
 
 
@@ -909,60 +820,55 @@ LONG FtDukptSetEncMod(SCARDHANDLE hCard,
     long rv=0;
     
     pthread_mutex_lock(&CommunicatonMutex);
-
+    
     if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
-
+    
     rv= CmdSetEncMod(0,bEncrypt,bEncFunc,bEncType);
     pthread_mutex_unlock(&CommunicatonMutex);
     
-    if (IFD_SUCCESS == rv) 
-    {
-        if (bEncrypt) {
-             isDukpt = 1;
+    if (IFD_SUCCESS == rv) {
+        if (bEncrypt && (!bEncType)) {
+            isDukpt = 1;
+        } else {
+            isDukpt = 0;
         }
         return SCARD_S_SUCCESS;
-    }
-    else 
-    {
+    } else {
         return SCARD_F_COMM_ERROR;
     }
     return 0;
 }
 
 LONG FtDukptGetKSN(SCARDHANDLE hCard, unsigned int * pnlength,
-              unsigned char *buffer)
+                   unsigned char *buffer)
 {
     long rv=0;
     unsigned char temp[64];
     unsigned int nlength=sizeof(temp);
     
-    if (* pnlength  < 10) 
-    {
+    if (* pnlength  < 10) {
         return SCARD_E_INVALID_PARAMETER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
-
+    
     if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
-
+    
     rv= CmdGetKSN( 0, &nlength,temp);
     pthread_mutex_unlock(&CommunicatonMutex);
     
-    if (IFD_SUCCESS == rv) 
-    {
+    if (IFD_SUCCESS == rv) {
         memcpy(buffer, temp,10);
         return SCARD_S_SUCCESS;
-    }
-    else 
-    {
+    } else {
         return SCARD_F_COMM_ERROR;
-    }   
+    }
 }
 
 #pragma mark feitian's private command of reader
@@ -974,14 +880,67 @@ void FtGetLibVersion (char *buffer)
     sprintf(buffer, " ST:%01x.%01x.%01x",Ft_iR301U_Version[0],Ft_iR301U_Version[1],Ft_iR301U_Version[2]);
 }
 
+/**
+ *  get the current Reader type
+ *
+ *  @param readerType
+ *
+ *  @return errorCode
+ */
+LONG FtGetCurrentReaderType(unsigned int *readerType)
+{
+    
+    long returnValue = -1;
+    unsigned char temp[64] = {0};
+    unsigned int nlength=sizeof(temp);
+    
+    if (gIsOpen == 0) {
+        
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    
+    if (readerType == NULL) {
+        
+        return SCARD_E_INVALID_PARAMETER;
+    }
+    
+    //bR301
+    if (iR301_or_bR301 == 1) {
+        *readerType = READER_bR301;
+        return SCARD_S_SUCCESS;
+    }
+    
+    pthread_mutex_lock(&CommunicatonMutex);
+    
+    *readerType = READER_UNKOWN;
+    returnValue = CmdGetDevInfo(0,&nlength , temp);
+    
+    pthread_mutex_unlock(&CommunicatonMutex);
+    
+    if (IFD_SUCCESS == returnValue) {
+        
+        if (temp[0] == FT_READER_UA || temp[0] == FT_READER_UB || temp[0] == FT_READER_UC
+            || temp[0] == FT_READER_UC_B || temp[0] == FT_READER_UM || temp[0] == FT_READER_UD) {
+            *readerType = READER_iR301U_DOCK;
+        }
+        
+        if (temp[0] == FT_READER_UB_LT || temp[0] == FT_READER_UC_LT ||
+            temp[0] == FT_READER_UC_LT_B || temp[0] == FT_READER_UD_LT) {
+            *readerType = READER_iR301U_LIGHTING;
+        }
+    }
+    
+    return (int)returnValue;
+    
+}
 LONG FtGetSerialNum(SCARDHANDLE hCard, unsigned int  length,
-                              char * buffer)
+                    char * buffer)
 {
     long rv=0;
     unsigned char temp[64]={0};
     unsigned int nlength=sizeof(temp);
-
-    if (length < 16) 
+    
+    if (length < 16)
     {
         return SCARD_E_INVALID_PARAMETER;
     }
@@ -991,18 +950,18 @@ LONG FtGetSerialNum(SCARDHANDLE hCard, unsigned int  length,
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
-   
+    
     rv= CmdGetSerialNum( 0, &nlength,temp);
     
     pthread_mutex_unlock(&CommunicatonMutex);
-  
-    if (IFD_SUCCESS == rv) 
+    
+    if (IFD_SUCCESS == rv)
     {
         memcpy(buffer, temp,16);
         buffer[16]='\0';
         return SCARD_S_SUCCESS;
     }
-    else 
+    else
     {
         return SCARD_F_COMM_ERROR;
     }
@@ -1012,65 +971,62 @@ LONG FtWriteFlash(SCARDHANDLE hCard,unsigned char bOffset, unsigned char blength
                   unsigned char buffer[])
 {
     long rv=0;
-
-    if (bOffset+blength > 255 || blength == 0) 
-    {
-        return SCARD_E_INVALID_PARAMETER;
-    }
     
-    pthread_mutex_lock(&CommunicatonMutex);
-
-    if (gIsOpen == NO) {
-        pthread_mutex_unlock(&CommunicatonMutex);
-        return SCARD_E_READER_UNAVAILABLE;
-    }
-
-    rv= CmdWriteFlash(0,bOffset,blength,buffer);
-    pthread_mutex_unlock(&CommunicatonMutex);
-
-    if (IFD_SUCCESS == rv) 
-    {
-        return SCARD_S_SUCCESS;
-    }
-    else 
-    {
-        return SCARD_F_COMM_ERROR;
-    }
-}
-
-LONG FtReadFlash(SCARDHANDLE hCard,unsigned char bOffset, unsigned char blength,
-                  unsigned char buffer[])
-{
-    long rv=0;
-    unsigned char temp[300];
-
     if (bOffset+blength > 255 || blength == 0)
     {
         return SCARD_E_INVALID_PARAMETER;
     }
     
     pthread_mutex_lock(&CommunicatonMutex);
+    
+    if (gIsOpen == NO) {
+        pthread_mutex_unlock(&CommunicatonMutex);
+        return SCARD_E_READER_UNAVAILABLE;
+    }
+    
+    rv= CmdWriteFlash(0,bOffset,blength,buffer);
+    pthread_mutex_unlock(&CommunicatonMutex);
+    
+    if (IFD_SUCCESS == rv)
+    {
+        return SCARD_S_SUCCESS;
+    }
+    else
+    {
+        return SCARD_F_COMM_ERROR;
+    }
+}
 
+LONG FtReadFlash(SCARDHANDLE hCard,unsigned char bOffset, unsigned char blength,
+                 unsigned char buffer[])
+{
+    long rv=0;
+    unsigned char temp[300];
+    
+    if (bOffset+blength > 255 || blength == 0)
+    {
+        return SCARD_E_INVALID_PARAMETER;
+    }
+    
+    pthread_mutex_lock(&CommunicatonMutex);
+    
     if (gIsOpen == NO) {
         pthread_mutex_unlock(&CommunicatonMutex);
         return SCARD_E_READER_UNAVAILABLE;
     }
     rv= CmdReadFlash( 0,bOffset,blength,temp);
     pthread_mutex_unlock(&CommunicatonMutex);
-
-    if (IFD_SUCCESS == rv) 
+    
+    if (IFD_SUCCESS == rv)
     {
         memcpy(buffer, temp, blength);
         return SCARD_S_SUCCESS;
     }
-    else 
+    else
     {
         return SCARD_F_COMM_ERROR;
     }
 }
-
-#pragma mark feitian's private sle4442 command
-
 
 LONG FtSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
 {
@@ -1079,16 +1035,16 @@ LONG FtSetTimeout(SCARDCONTEXT hContext, DWORD dwTimeout)
         return SCARD_E_INVALID_HANDLE;
     }
     
-    if (dwTimeout >= 1 ) 
+    if (dwTimeout >= 1 )
     {
-       g_dwTimeOut = dwTimeout  ;
+        g_dwTimeOut = dwTimeout  ;
     }
     else
     {
         return SCARD_E_INVALID_VALUE;
     }
     
-	return SCARD_S_SUCCESS;
+    return SCARD_S_SUCCESS;
 }
 
 
@@ -1096,5 +1052,3 @@ void FtDidEnterBackground(unsigned int bDidEnter)
 {
     
 }
-
-
